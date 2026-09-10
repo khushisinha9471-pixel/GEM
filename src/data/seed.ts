@@ -22,7 +22,7 @@ export const CUSTOMERS: Customer[] = [
 ];
 
 export const INTERNAL_MEMBERS: InternalMember[] = [
-  { id: 'int-moazi', name: 'Moazi Rahman', role: 'Engineer', email: 'moazi.rahman@gem-mro.com' },
+  { id: 'int-muazzi', name: 'Muazzi', role: 'Engineering VP', email: 'muazzi@gem-mro.com' },
   { id: 'int-priya', name: 'Priya Nair', role: 'Reliability Engineer', email: 'priya.nair@gem-mro.com' },
   { id: 'int-james', name: 'James Carter', role: 'Cost Analyst', email: 'james.carter@gem-mro.com' },
 ];
@@ -161,9 +161,9 @@ export const INITIAL_APPROVALS: Approval[] = [
     forwardRequests: [
       {
         id: 'fwd-1',
-        recipientName: 'Moazi Rahman',
-        recipientRole: 'Engineer',
-        recipientEmail: 'moazi.rahman@gem-mro.com',
+        recipientName: 'Muazzi',
+        recipientRole: 'Engineering VP',
+        recipientEmail: 'muazzi@gem-mro.com',
         requestType: 'Repair Recommendation',
         question:
           'Customer has requested an engineer\'s recommendation. Please advise whether we should proceed with the repair or replace the part.',
@@ -178,7 +178,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     extraAudit: [
       auditEvt('2026-09-10T10:15:00+05:30', 'Harini V (CSM)', 'Customer response requested', 'Initial CSM message sent to customer.'),
       auditEvt('2026-09-10T14:20:00+05:30', 'Sarah Mitchell', 'Customer responded', 'Customer requested engineering recommendation.'),
-      auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Moazi Rahman (Engineer) via Gmail — Repair Recommendation.'),
+      auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Muazzi (Engineering VP) via Gmail — Repair Recommendation.'),
     ],
   }),
 
