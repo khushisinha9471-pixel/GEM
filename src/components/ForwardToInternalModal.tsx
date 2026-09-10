@@ -1,0 +1,163 @@
+import React from 'react';
+import { X, Send, Mail } from 'lucide-react';
+import type { Approval, Attachment } from '../types';
+import { INTERNAL_MEMBERS, REQUEST_TYPES } from '../data/seed';
+import { AttachmentManager } from './AttachmentManager';
+import { useStore, genForwardId } from '../state/store';
+import { itemPartLabel } from '../utils/format';
+
+export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
+  const { state, dispatch } = useStore();
+  const [recipientId, setRecipientId] = React.useState('');
+  const [requestType, setRequestType] = React.useState(REQUEST_TYPES[0]);
+  const [question, setQuestion] = React.useState('');
+  const [attachments, setAttachments] = React.useState<Attachment[]>([]);
+  const [provider, setProvider] = React.useState<'Gmail' | 'Outlook'>(state.emailConnection.provider ?? 'Gmail');
+  const [query, setQuery] = React.useState('');
+
+  const recipient = INTERNAL_MEMBERS.find((m) => m.id === recipientId);
+  const filteredMembers = INTERNAL_MEMBERS.filter((m) => `${m.name} ${m.role}`.toLowerCase().includes(query.toLowerCase()));
+
+  const subjectLine = `[${approval.id}] ${requestType} Requested – ${itemPartLabel(approval)}`;
+
+  function send() {
+    if (!recipient || !question.trim()) return;
+    dispatch({
+      type: 'FORWARD_TO_INTERNAL',
+      approvalId: approval.id,
+      forwardRequest: {
+        id: genForwardId(),
+        recipientName: recipient.name,
+        recipientRole: recipient.role,
+        recipientEmail: recipient.email,
+        requestType,
+        question: question.trim(),
+        attachments,
+        sentAt: new Date().toISOString(),
+        sentVia: provider,
+        status: 'awaiting',
+      },
+    });
+    onClose();
+  }
+
+  return (
+    <div className="modal-overlay-center">
+      <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-pop">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div>
+            <h2 className="text-base font-semibold text-navy">Forward to Internal Member</h2>
+            <p className="text-xs text-slate">Request input without granting Customer Portal access — sent via email.</p>
+          </div>
+          <button onClick={onClose} className="rounded-full p-1.5 text-slate hover:bg-surface hover:text-navy">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+          <div>
+            <label className="field-label">Internal Recipient *</label>
+            <input
+              value={query || (recipient ? `${recipient.name} — ${recipient.role}` : '')}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setRecipientId('');
+              }}
+              placeholder="Search internal team member..."
+              className="field-input"
+            />
+            {query && !recipient && (
+              <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-line">
+                {filteredMembers.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setRecipientId(m.id);
+                      setQuery('');
+                    }}
+                    className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-surface"
+                  >
+                    <span className="font-medium text-navy">{m.name}</span>
+                    <span className="text-xs text-slate">{m.role}</span>
+                  </button>
+                ))}
+                {filteredMembers.length === 0 && <p className="px-3 py-2 text-xs text-slate">No matches.</p>}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="field-label">Request Type</label>
+            <select value={requestType} onChange={(e) => setRequestType(e.target.value)} className="select-input">
+              {REQUEST_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="field-label">CSM Question / Request *</label>
+            <textarea
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              rows={4}
+              placeholder="Customer has requested an engineer's recommendation. Please advise whether we should proceed with the repair or replace the part."
+              className="textarea-input"
+            />
+          </div>
+
+          <AttachmentManager attachments={attachments} onChange={setAttachments} />
+
+          <div className="rounded-lg border border-line bg-surface/40 p-3">
+            <p className="text-xs font-semibold text-slate">Email Preview</p>
+            <div className="mt-2 space-y-1 text-xs text-navy">
+              <p>
+                <span className="font-medium text-slate">To:</span> {recipient?.email ?? '—'}
+              </p>
+              <p>
+                <span className="font-medium text-slate">Subject:</span> {subjectLine}
+              </p>
+              <p className="text-slate">
+                Includes: Approval ID, Type/Subtype, Item/Part, Requirement, Cost, your question, and{' '}
+                {attachments.length} attachment(s).
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="field-label">Send Via</label>
+            <div className="flex gap-2">
+              {(['Gmail', 'Outlook'] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setProvider(p)}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium ${
+                    provider === p ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate hover:bg-surface'
+                  }`}
+                >
+                  <Mail size={14} />
+                  {p}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-slate">
+              Connected account: <span className="font-medium text-navy">{state.emailConnection.account ?? 'Not connected'}</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-line px-5 py-3.5">
+          <button onClick={onClose} className="btn-secondary">
+            Cancel
+          </button>
+          <button onClick={send} disabled={!recipient || !question.trim()} className="btn-primary">
+            <Send size={14} />
+            Send Email
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
