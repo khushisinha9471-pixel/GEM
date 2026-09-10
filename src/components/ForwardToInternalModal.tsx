@@ -135,7 +135,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
           <div className="rounded-xl border border-line p-3">
             <p className="text-sm font-semibold text-navy">Email Integration — Live Test</p>
             <p className="mt-0.5 text-xs text-slate">
-              Connects a real Gmail or Outlook mailbox. Certra identifies the Approval ID from the subject line and
+              Connects a real Gmail or Outlook mailbox. The Approval ID is identified from the subject line and
               captures the reply automatically once it arrives — no manual copy/paste.
             </p>
 

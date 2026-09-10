@@ -2,7 +2,7 @@ import React from 'react';
 import type { Approval } from '../types';
 import { StatusPill } from './StatusPill';
 import { ResponseCell } from './ResponseCell';
-import { formatCost, itemPartLabel, truncate } from '../utils/format';
+import { formatCost, itemPartLabel } from '../utils/format';
 import { latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
 import { FileQuestion } from 'lucide-react';
 
@@ -25,7 +25,7 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
           <col className="w-[80px]" />
           <col className="w-[116px]" />
           <col className="w-[150px]" />
-          <col className="w-[190px]" />
+          <col className="w-[240px]" />
           <col className="w-[80px]" />
           <col className="w-[264px]" />
           <col className="w-[264px]" />
@@ -58,9 +58,7 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
               <td className="px-3 py-3 align-top text-sm font-medium text-navy">{a.type}</td>
               <td className="px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
               <td className="px-3 py-3 align-top text-sm text-navy">{itemPartLabel(a)}</td>
-              <td className="px-3 py-3 align-top text-sm text-slate line-clamp-2" title={a.requirement}>
-                {truncate(a.requirement, 110)}
-              </td>
+              <td className="px-3 py-3 align-top text-sm text-slate">{a.requirement}</td>
               <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
               <td className="px-3 py-3 align-top">
                 <ResponseCell message={latestCsmResponse(a)} emptyLabel="No CSM response yet" />
