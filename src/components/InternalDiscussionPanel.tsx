@@ -1,9 +1,10 @@
 import React from 'react';
-import { Clock, Mail, Paperclip, Share2, Lock, Send, FlaskConical } from 'lucide-react';
+import { Clock, Mail, Paperclip, Share2, Lock, Send, FlaskConical, MessagesSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Approval, ConversationMessage } from '../types';
 import { formatDateTime } from '../utils/format';
 import { internalMessages } from '../utils/approvalHelpers';
 import { useStore } from '../state/store';
+import { ConversationThread } from './ConversationThread';
 
 const SIMULATED_REPLIES = [
   'We recommend replacing the part rather than proceeding with the proposed repair.',
@@ -20,10 +21,20 @@ export const InternalDiscussionPanel: React.FC<{
   const { dispatch } = useStore();
   const messages = internalMessages(approval);
   const awaiting = approval.forwardRequests.filter((f) => f.status === 'awaiting');
+  const [expandedHistory, setExpandedHistory] = React.useState<Set<string>>(new Set());
 
   function simulateReply(forwardRequestId: string) {
     const body = SIMULATED_REPLIES[Math.floor(Math.random() * SIMULATED_REPLIES.length)];
     dispatch({ type: 'SIMULATE_MAILBOX_REPLY', approvalId: approval.id, forwardRequestId, body });
+  }
+
+  function toggleHistory(id: string) {
+    setExpandedHistory((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }
 
   return (
@@ -40,25 +51,45 @@ export const InternalDiscussionPanel: React.FC<{
       </div>
 
       {awaiting.map((f) => (
-        <div key={f.id} className="flex items-start justify-between gap-3 rounded-xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-800">
-              <Clock size={13} />
-              Awaiting response from {f.recipientName} ({f.recipientRole})
+        <div key={f.id} className="rounded-xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-800">
+                <Clock size={13} />
+                Awaiting response from {f.recipientName} ({f.recipientRole})
+              </div>
+              <p className="mt-1 text-xs text-slate">
+                {f.requestType} request sent via {f.sentVia} on {formatDateTime(f.sentAt)}
+              </p>
+              <p className="mt-1 text-xs italic text-slate">&ldquo;{f.question}&rdquo;</p>
             </div>
-            <p className="mt-1 text-xs text-slate">
-              {f.requestType} request sent via {f.sentVia} on {formatDateTime(f.sentAt)}
-            </p>
-            <p className="mt-1 text-xs italic text-slate">&ldquo;{f.question}&rdquo;</p>
+            <button
+              onClick={() => simulateReply(f.id)}
+              className="flex flex-none items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+              title="Test capability: simulate the internal recipient replying from their test mailbox"
+            >
+              <FlaskConical size={13} />
+              Simulate Test Mailbox Reply
+            </button>
           </div>
-          <button
-            onClick={() => simulateReply(f.id)}
-            className="flex flex-none items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
-            title="Test capability: simulate the internal recipient replying from their test mailbox"
-          >
-            <FlaskConical size={13} />
-            Simulate Test Mailbox Reply
-          </button>
+
+          {f.includeHistory && (f.includedMessages?.length ?? 0) > 0 && (
+            <div className="mt-2 border-t border-amber-200/70 pt-2">
+              <button
+                onClick={() => toggleHistory(f.id)}
+                className="flex items-center gap-1.5 text-xs font-medium text-amber-800 hover:underline"
+              >
+                <MessagesSquare size={12} />
+                Full conversation included ({f.includedMessages!.length} message{f.includedMessages!.length === 1 ? '' : 's'})
+                {expandedHistory.has(f.id) ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+              </button>
+              {expandedHistory.has(f.id) && (
+                <div className="mt-2 max-h-56 overflow-y-auto rounded-lg bg-white/70 p-3">
+                  <ConversationThread messages={f.includedMessages!} emptyLabel="No conversation was included." />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
 

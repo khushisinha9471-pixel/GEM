@@ -118,6 +118,32 @@ function build(d: Draft): Approval {
   };
 }
 
+const app001Messages: ConversationMessage[] = [
+  msg({
+    channel: 'customer',
+    authorName: 'Harini V',
+    authorRole: 'CSM',
+    body: 'Additional repair is required based on inspection findings. Please review the additional repair requirement and confirm whether the repair may proceed.',
+    date: '2026-09-10T10:15:00+05:30',
+    attachments: [att('Inspection Report.pdf', 'reports-library', '2026-09-10', { reportType: 'Inspection' }), att('Findings Summary.pdf', 'external', '2026-09-10', { uploadedBy: 'Harini V' })],
+  }),
+  msg({
+    channel: 'customer',
+    authorName: 'Sarah Mitchell',
+    authorRole: 'Customer',
+    body: "Can we get an engineer's recommendation before approving this?",
+    date: '2026-09-10T14:20:00+05:30',
+    attachments: [att('Query_Notes.pdf', 'external', '2026-09-10', { uploadedBy: 'Sarah Mitchell' })],
+  }),
+  msg({
+    channel: 'customer',
+    authorName: 'Harini V',
+    authorRole: 'CSM',
+    body: 'We will obtain an engineering recommendation and revert.',
+    date: '2026-09-10T15:05:00+05:30',
+  }),
+];
+
 export const INITIAL_APPROVALS: Approval[] = [
   // APP-001 — flagship demo: full Customer <-> CSM <-> Internal Engineer workflow
   build({
@@ -131,31 +157,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     cost: 12500,
     status: 'Open',
     createdAt: '2026-09-10T09:45:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Additional repair is required based on inspection findings. Please review the additional repair requirement and confirm whether the repair may proceed.',
-        date: '2026-09-10T10:15:00+05:30',
-        attachments: [att('Inspection Report.pdf', 'reports-library', '2026-09-10', { reportType: 'Inspection' }), att('Findings Summary.pdf', 'external', '2026-09-10', { uploadedBy: 'Harini V' })],
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'Sarah Mitchell',
-        authorRole: 'Customer',
-        body: "Can we get an engineer's recommendation before approving this?",
-        date: '2026-09-10T14:20:00+05:30',
-        attachments: [att('Query_Notes.pdf', 'external', '2026-09-10', { uploadedBy: 'Sarah Mitchell' })],
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'We will obtain an engineering recommendation and revert.',
-        date: '2026-09-10T15:05:00+05:30',
-      }),
-    ],
+    messages: app001Messages,
     forwardRequests: [
       {
         id: 'fwd-1',
@@ -169,6 +171,8 @@ export const INITIAL_APPROVALS: Approval[] = [
         sentAt: '2026-09-10T15:10:00+05:30',
         sentVia: 'Gmail',
         status: 'awaiting',
+        includeHistory: true,
+        includedMessages: app001Messages,
       },
     ],
     extraAudit: [

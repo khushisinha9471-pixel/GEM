@@ -1,10 +1,12 @@
 import React from 'react';
-import { X, Send, Mail } from 'lucide-react';
+import { X, Send, Mail, MessagesSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Approval, Attachment } from '../types';
 import { INTERNAL_MEMBERS, REQUEST_TYPES } from '../data/seed';
 import { AttachmentManager } from './AttachmentManager';
+import { ConversationThread } from './ConversationThread';
 import { useStore, genForwardId } from '../state/store';
 import { itemPartLabel } from '../utils/format';
+import { customerVisibleMessages } from '../utils/approvalHelpers';
 
 export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
   const { state, dispatch } = useStore();
@@ -16,9 +18,12 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const [query, setQuery] = React.useState('');
   const [sendingAccount, setSendingAccount] = React.useState(state.emailConnection.account ?? '');
   const [testRecipientEmail, setTestRecipientEmail] = React.useState('');
+  const [includeHistory, setIncludeHistory] = React.useState(true);
+  const [historyExpanded, setHistoryExpanded] = React.useState(false);
 
   const recipient = INTERNAL_MEMBERS.find((m) => m.id === recipientId);
   const filteredMembers = INTERNAL_MEMBERS.filter((m) => `${m.name} ${m.role}`.toLowerCase().includes(query.toLowerCase()));
+  const conversationHistory = customerVisibleMessages(approval);
 
   const subjectLine = `[${approval.id}] ${requestType} Requested – ${itemPartLabel(approval)}`;
   const effectiveRecipientEmail = testRecipientEmail.trim() || recipient?.email;
@@ -42,6 +47,8 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         sentAt: new Date().toISOString(),
         sentVia: provider,
         status: 'awaiting',
+        includeHistory,
+        includedMessages: includeHistory ? conversationHistory : [],
       },
     });
     onClose();
@@ -116,6 +123,46 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
 
           <AttachmentManager attachments={attachments} onChange={setAttachments} />
 
+          <div className="rounded-xl border border-line p-3">
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="checkbox"
+                checked={includeHistory}
+                onChange={(e) => setIncludeHistory(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-[#0B2345]"
+              />
+              <span className="flex-1">
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-navy">
+                  <MessagesSquare size={14} />
+                  Include full conversation history
+                </span>
+                <span className="mt-0.5 block text-xs text-slate">
+                  Send the customer conversation so far ({conversationHistory.length} message
+                  {conversationHistory.length === 1 ? '' : 's'}) along with your question, so{' '}
+                  {recipient?.name ?? 'the reviewer'} has the complete context — not just this one message.
+                </span>
+              </span>
+            </label>
+
+            {includeHistory && conversationHistory.length > 0 && (
+              <div className="mt-3 border-t border-line pt-3">
+                <button
+                  type="button"
+                  onClick={() => setHistoryExpanded((v) => !v)}
+                  className="flex items-center gap-1 text-xs font-medium text-navy hover:underline"
+                >
+                  {historyExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  {historyExpanded ? 'Hide' : 'Preview'} what will be forwarded
+                </button>
+                {historyExpanded && (
+                  <div className="mt-3 max-h-56 overflow-y-auto rounded-lg bg-surface/40 p-3">
+                    <ConversationThread messages={conversationHistory} emptyLabel="No conversation yet." />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="rounded-lg border border-line bg-surface/40 p-3">
             <p className="text-xs font-semibold text-slate">Email Preview</p>
             <div className="mt-2 space-y-1 text-xs text-navy">
@@ -127,7 +174,12 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
               </p>
               <p className="text-slate">
                 Includes: Approval ID, Type/Subtype, Item/Part, Requirement, Cost, your question, and{' '}
-                {attachments.length} attachment(s).
+                {attachments.length} attachment(s)
+                {includeHistory && conversationHistory.length > 0
+                  ? `, plus the full conversation history (${conversationHistory.length} prior message${
+                      conversationHistory.length === 1 ? '' : 's'
+                    }).`
+                  : '.'}
               </p>
             </div>
           </div>

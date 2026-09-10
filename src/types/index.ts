@@ -77,6 +77,8 @@ export interface InternalForwardRequest {
   sentVia: 'Gmail' | 'Outlook';
   status: 'awaiting' | 'responded';
   responseMessageId?: string;
+  includeHistory?: boolean;
+  includedMessages?: ConversationMessage[]; // snapshot of the customer conversation at send time, when includeHistory is true
 }
 
 export interface AuditEvent {
