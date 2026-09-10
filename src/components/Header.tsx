@@ -1,23 +1,7 @@
 import React from 'react';
 import { Bell, LayoutGrid, RefreshCw, Search, ChevronDown, Moon, CircleUserRound } from 'lucide-react';
 import { NotificationsDropdown } from './NotificationsDropdown';
-
-const GemLogo: React.FC = () => (
-  <svg viewBox="0 0 24 24" className="h-9 w-9">
-    <defs>
-      <radialGradient id="gemLogoGrad" cx="50%" cy="50%" r="65%">
-        <stop offset="0%" stopColor="#F7C948" />
-        <stop offset="100%" stopColor="#C8860D" />
-      </radialGradient>
-    </defs>
-    <g fill="url(#gemLogoGrad)">
-      {Array.from({ length: 10 }).map((_, i) => (
-        <ellipse key={i} cx="12" cy="6.2" rx="2.1" ry="5.3" transform={`rotate(${i * 36} 12 12)`} />
-      ))}
-    </g>
-    <circle cx="12" cy="12" r="2.3" fill="#8A5A00" />
-  </svg>
-);
+import { GemLogo } from './GemLogo';
 
 export const Header: React.FC<{ onOpenApproval: (id: string) => void }> = ({ onOpenApproval }) => {
   const [notifOpen, setNotifOpen] = React.useState(false);
