@@ -7,11 +7,11 @@ import { defineConfig } from 'vite'
 // split across entries) — needed so each can be inlined into one file.
 const target = process.env.BUILD_TARGET
 
-const singleEntryInput =
+const singleEntryInput: Record<string, string> | undefined =
   target === 'customer'
-    ? { customer: resolve(import.meta.dirname,'customer.html') }
+    ? { customer: resolve(import.meta.dirname, 'customer.html') }
     : target === 'main'
-      ? { main: resolve(import.meta.dirname,'index.html') }
+      ? { main: resolve(import.meta.dirname, 'index.html') }
       : undefined
 
 // https://vite.dev/config/
