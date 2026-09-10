@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ShieldCheck, Send, CheckCircle2, RotateCcw, FlaskConical } from 'lucide-react';
+import { X, ShieldCheck, Send, CheckCircle2, RotateCcw, FlaskConical, Trash2 } from 'lucide-react';
 import type { Approval, Attachment, ConversationMessage } from '../types';
 import { StatusPill, OutcomeBadge } from './StatusPill';
 import { formatCost, itemPartLabel } from '../utils/format';
@@ -12,6 +12,7 @@ import { AccessModal } from './AccessModal';
 import { CloseApprovalModal } from './CloseApprovalModal';
 import { ForwardToInternalModal } from './ForwardToInternalModal';
 import { ShareEngineerResponseModal } from './ShareEngineerResponseModal';
+import { DeleteApprovalModal } from './DeleteApprovalModal';
 import { AttachmentManager } from './AttachmentManager';
 import { useStore } from '../state/store';
 import { CUSTOMERS } from '../data/seed';
@@ -36,6 +37,7 @@ export const ApprovalDetailPanel: React.FC<{
   const [closeOpen, setCloseOpen] = React.useState(false);
   const [forwardOpen, setForwardOpen] = React.useState(false);
   const [shareMessage, setShareMessage] = React.useState<ConversationMessage | null>(null);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
 
   const [replyBody, setReplyBody] = React.useState('');
   const [replyAttachments, setReplyAttachments] = React.useState<Attachment[]>([]);
@@ -106,6 +108,13 @@ export const ApprovalDetailPanel: React.FC<{
                 Reopen
               </button>
             )}
+            <button
+              onClick={() => setDeleteOpen(true)}
+              className="ml-auto inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-2 text-sm font-semibold text-red-600 transition hover:border-red-200 hover:bg-red-50"
+            >
+              <Trash2 size={14} />
+              Delete Approval
+            </button>
           </div>
         </div>
 
@@ -188,6 +197,9 @@ export const ApprovalDetailPanel: React.FC<{
       {forwardOpen && <ForwardToInternalModal approval={approval} onClose={() => setForwardOpen(false)} />}
       {shareMessage && (
         <ShareEngineerResponseModal approval={approval} message={shareMessage} onClose={() => setShareMessage(null)} />
+      )}
+      {deleteOpen && (
+        <DeleteApprovalModal approval={approval} onClose={() => setDeleteOpen(false)} onDeleted={onClose} />
       )}
     </div>
   );

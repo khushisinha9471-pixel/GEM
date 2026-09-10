@@ -22,10 +22,10 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
       <table className="w-full min-w-[1080px] table-fixed border-collapse text-left">
         <colgroup>
           <col className="w-[48px]" />
-          <col className="w-[80px]" />
-          <col className="w-[116px]" />
-          <col className="w-[150px]" />
-          <col className="w-[240px]" />
+          <col className="w-[168px]" />
+          <col className="w-[122px]" />
+          <col className="w-[140px]" />
+          <col className="w-[202px]" />
           <col className="w-[80px]" />
           <col className="w-[264px]" />
           <col className="w-[264px]" />
@@ -55,9 +55,9 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
                 <div className="font-medium text-navy">{idx + 1}</div>
                 <div className="mt-0.5 text-[11px] text-slate/80">{a.id}</div>
               </td>
-              <td className="px-3 py-3 align-top text-sm font-medium text-navy">{a.type}</td>
-              <td className="px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
-              <td className="px-3 py-3 align-top text-sm text-navy">{itemPartLabel(a)}</td>
+              <td className="break-words px-3 py-3 align-top text-sm font-medium text-navy">{a.type}</td>
+              <td className="break-words px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
+              <td className="break-words px-3 py-3 align-top text-sm text-navy">{itemPartLabel(a)}</td>
               <td className="px-3 py-3 align-top text-sm text-slate">{a.requirement}</td>
               <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
               <td className="px-3 py-3 align-top">

@@ -15,10 +15,10 @@ export const WORK_ORDER = {
 };
 
 export const CUSTOMERS: Customer[] = [
-  { id: 'cust-a', name: 'AerCap Holdings' },
-  { id: 'cust-b', name: 'SMBC Aviation Capital' },
-  { id: 'cust-c', name: 'Avolon Aerospace' },
-  { id: 'cust-d', name: 'BOC Aviation' },
+  { id: 'cust-a', name: 'Sarah Mitchell' },
+  { id: 'cust-b', name: 'David Chen' },
+  { id: 'cust-c', name: 'Priya Patel' },
+  { id: 'cust-d', name: 'James Anderson' },
 ];
 
 export const INTERNAL_MEMBERS: InternalMember[] = [
@@ -142,11 +142,11 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'AerCap Holdings',
+        authorName: 'Sarah Mitchell',
         authorRole: 'Customer',
         body: "Can we get an engineer's recommendation before approving this?",
         date: '2026-09-10T14:20:00+05:30',
-        attachments: [att('Query_Notes.pdf', 'external', '2026-09-10', { uploadedBy: 'AerCap Holdings' })],
+        attachments: [att('Query_Notes.pdf', 'external', '2026-09-10', { uploadedBy: 'Sarah Mitchell' })],
       }),
       msg({
         channel: 'customer',
@@ -173,7 +173,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     ],
     extraAudit: [
       auditEvt('2026-09-10T10:15:00+05:30', 'Harini V (CSM)', 'Customer response requested', 'Initial CSM message sent to customer.'),
-      auditEvt('2026-09-10T14:20:00+05:30', 'AerCap Holdings', 'Customer responded', 'Customer requested engineering recommendation.'),
+      auditEvt('2026-09-10T14:20:00+05:30', 'Sarah Mitchell', 'Customer responded', 'Customer requested engineering recommendation.'),
       auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Moazi Rahman (Engineer) via Gmail — Repair Recommendation.'),
     ],
   }),
@@ -200,7 +200,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'SMBC Aviation Capital',
+        authorName: 'David Chen',
         authorRole: 'Customer',
         body: 'Approved.',
         date: '2026-09-05T16:40:00+05:30',
@@ -209,7 +209,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     outcome: 'Approved',
     closedAt: '2026-09-06T09:00:00+05:30',
     extraAudit: [
-      auditEvt('2026-09-05T16:40:00+05:30', 'SMBC Aviation Capital', 'Customer responded', 'Customer approved the replacement.'),
+      auditEvt('2026-09-05T16:40:00+05:30', 'David Chen', 'Customer responded', 'Customer approved the replacement.'),
       auditEvt('2026-09-06T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Approved.'),
     ],
   }),
@@ -236,7 +236,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'Avolon Aerospace',
+        authorName: 'Priya Patel',
         authorRole: 'Customer',
         body: 'Please provide the BTB package.',
         date: '2026-09-08T09:15:00+05:30',
@@ -265,7 +265,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'BOC Aviation',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'We will provide the part.',
         date: '2026-09-08T17:00:00+05:30',
@@ -293,7 +293,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'AerCap Holdings',
+        authorName: 'Sarah Mitchell',
         authorRole: 'Customer',
         body: 'Please provide engineering clarification.',
         date: '2026-09-09T13:45:00+05:30',
@@ -323,7 +323,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'BOC Aviation',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'What is the lead time on the exchange unit?',
         date: '2026-09-06T15:10:00+05:30',
@@ -398,7 +398,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'SMBC Aviation Capital',
+        authorName: 'David Chen',
         authorRole: 'Customer',
         body: 'Reviewing with our records team, will revert shortly.',
         date: '2026-09-05T10:00:00+05:30',
@@ -427,7 +427,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'Avolon Aerospace',
+        authorName: 'Priya Patel',
         authorRole: 'Customer',
         body: 'Repair is not approved.',
         date: '2026-09-02T14:00:00+05:30',
@@ -441,7 +441,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'Avolon Aerospace',
+        authorName: 'Priya Patel',
         authorRole: 'Customer',
         body: 'Carry forward approved.',
         date: '2026-09-03T10:00:00+05:30',
@@ -475,14 +475,14 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'BOC Aviation',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'We do not approve this replacement.',
         date: '2026-09-01T16:00:00+05:30',
       }),
       msg({
         channel: 'customer',
-        authorName: 'BOC Aviation',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'We will provide an alternative part.',
         date: '2026-09-02T10:00:00+05:30',
@@ -516,7 +516,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'AerCap Holdings',
+        authorName: 'Sarah Mitchell',
         authorRole: 'Customer',
         body: 'Alternative part approved for installation.',
         date: '2026-08-30T15:00:00+05:30',
@@ -549,7 +549,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'SMBC Aviation Capital',
+        authorName: 'David Chen',
         authorRole: 'Customer',
         body: 'Payment timing confirmed as per agreed schedule.',
         date: '2026-08-29T16:00:00+05:30',
@@ -649,7 +649,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'Avolon Aerospace',
+        authorName: 'Priya Patel',
         authorRole: 'Customer',
         body: 'Can you share the erosion measurement data?',
         date: '2026-09-08T18:00:00+05:30',
@@ -701,7 +701,7 @@ export const INITIAL_APPROVALS: Approval[] = [
       }),
       msg({
         channel: 'customer',
-        authorName: 'BOC Aviation',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'Please share the current market pricing before we approve.',
         date: '2026-09-04T11:00:00+05:30',

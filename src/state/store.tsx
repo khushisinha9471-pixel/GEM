@@ -44,6 +44,7 @@ type Action =
   | { type: 'UPDATE_ACCESS'; approvalId: string; access: 'all' | 'selected'; selectedCustomerIds: string[] }
   | { type: 'CLOSE_APPROVAL'; approvalId: string; outcome: FinalOutcome }
   | { type: 'REOPEN_APPROVAL'; approvalId: string }
+  | { type: 'DELETE_APPROVAL'; approvalId: string }
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
   | { type: 'MARK_ALL_NOTIFICATIONS_READ' }
   | { type: 'ADD_TOAST'; toast: Toast }
@@ -326,6 +327,18 @@ function reducer(state: State, action: Action): State {
         audit: [...a.audit, { id: genId('audit'), date: nowIso(), actor: 'Harini V (CSM)', action: 'Status changed to Open', detail: 'Approval reopened.' }],
       }));
       return { ...state, approvals };
+    }
+    case 'DELETE_APPROVAL': {
+      const deleted = state.approvals.find((a) => a.id === action.approvalId);
+      return {
+        ...state,
+        approvals: state.approvals.filter((a) => a.id !== action.approvalId),
+        notifications: state.notifications.filter((n) => n.approvalId !== action.approvalId),
+        toasts: [
+          ...state.toasts,
+          { id: genId('toast'), title: 'Approval deleted', body: deleted?.id, tone: 'info' },
+        ],
+      };
     }
     case 'MARK_NOTIFICATION_READ': {
       return { ...state, notifications: state.notifications.map((n) => (n.id === action.id ? { ...n, read: true } : n)) };
