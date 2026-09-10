@@ -1,11 +1,8 @@
 import React from 'react';
-import { Bell, LayoutGrid, RefreshCw, Search, ChevronDown, Settings } from 'lucide-react';
+import { Bell, LayoutGrid, RefreshCw, Search, ChevronDown } from 'lucide-react';
 import { NotificationsDropdown } from './NotificationsDropdown';
 
-export const Header: React.FC<{ onOpenEmailSettings: () => void; onOpenApproval: (id: string) => void }> = ({
-  onOpenEmailSettings,
-  onOpenApproval,
-}) => {
+export const Header: React.FC<{ onOpenApproval: (id: string) => void }> = ({ onOpenApproval }) => {
   const [notifOpen, setNotifOpen] = React.useState(false);
 
   return (
@@ -28,14 +25,6 @@ export const Header: React.FC<{ onOpenEmailSettings: () => void; onOpenApproval:
       </div>
 
       <div className="flex items-center gap-4 text-slate">
-        <button
-          onClick={onOpenEmailSettings}
-          className="hidden items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-slate hover:bg-surface md:flex"
-          title="Email integration settings"
-        >
-          <Settings size={14} />
-          Email Settings
-        </button>
         <button className="hidden items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-slate hover:bg-surface md:flex">
           <LayoutGrid size={14} />
           Switch portal

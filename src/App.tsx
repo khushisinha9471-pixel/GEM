@@ -9,7 +9,6 @@ import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
 import { NotifyCustomerModal } from './components/NotifyCustomerModal';
-import { EmailSettingsModal } from './components/EmailSettingsModal';
 import { searchableText } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 import { ChevronRight } from 'lucide-react';
@@ -21,7 +20,6 @@ const AppShell: React.FC = () => {
   const [statusCard, setStatusCard] = React.useState<ApprovalStatus | 'All'>('All');
   const [createOpen, setCreateOpen] = React.useState(false);
   const [notifyOpen, setNotifyOpen] = React.useState<{ open: boolean; approvalId?: string }>({ open: false });
-  const [emailSettingsOpen, setEmailSettingsOpen] = React.useState(false);
   const [selectedApprovalId, setSelectedApprovalId] = React.useState<string | null>(null);
 
   const approvals = state.approvals;
@@ -42,7 +40,7 @@ const AppShell: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-surface">
-      <Header onOpenEmailSettings={() => setEmailSettingsOpen(true)} onOpenApproval={setSelectedApprovalId} />
+      <Header onOpenApproval={setSelectedApprovalId} />
 
       <main className="mx-auto max-w-[1440px] px-6 py-6">
         <div className="mb-5 flex flex-wrap items-center gap-2 text-sm text-slate">
@@ -102,8 +100,6 @@ const AppShell: React.FC = () => {
           onClose={() => setNotifyOpen({ open: false })}
         />
       )}
-
-      {emailSettingsOpen && <EmailSettingsModal onClose={() => setEmailSettingsOpen(false)} />}
     </div>
   );
 };

@@ -14,7 +14,7 @@ export const StatusPill: React.FC<{ status: 'Open' | 'Closed' }> = ({ status }) 
 };
 
 export const OutcomeBadge: React.FC<{ outcome: string }> = ({ outcome }) => {
-  const negative = outcome === 'Refused / Not Approved';
+  const negative = outcome === 'Rejected';
   const styles = negative ? 'bg-red-50 text-red-700 border-red-200' : 'bg-navy-50 text-navy border-navy-100';
   return <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${styles}`}>{outcome}</span>;
 };

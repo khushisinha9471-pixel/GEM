@@ -9,7 +9,7 @@ export type ApprovalStatus = 'Open' | 'Closed';
 export type FinalOutcome =
   | 'Approved'
   | 'Approved with Conditions'
-  | 'Refused / Not Approved'
+  | 'Rejected'
   | 'Carry Forward'
   | 'Customer Supplied Another Part'
   | 'Another Part Installed'
@@ -28,7 +28,7 @@ export const SUBTYPES_BY_TYPE: Record<ApprovalType, string[]> = {
 export const FINAL_OUTCOMES: FinalOutcome[] = [
   'Approved',
   'Approved with Conditions',
-  'Refused / Not Approved',
+  'Rejected',
   'Carry Forward',
   'Customer Supplied Another Part',
   'Another Part Installed',

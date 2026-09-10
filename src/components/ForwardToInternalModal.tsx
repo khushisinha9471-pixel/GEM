@@ -14,14 +14,20 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
   const [provider, setProvider] = React.useState<'Gmail' | 'Outlook'>(state.emailConnection.provider ?? 'Gmail');
   const [query, setQuery] = React.useState('');
+  const [sendingAccount, setSendingAccount] = React.useState(state.emailConnection.account ?? '');
+  const [testRecipientEmail, setTestRecipientEmail] = React.useState('');
 
   const recipient = INTERNAL_MEMBERS.find((m) => m.id === recipientId);
   const filteredMembers = INTERNAL_MEMBERS.filter((m) => `${m.name} ${m.role}`.toLowerCase().includes(query.toLowerCase()));
 
   const subjectLine = `[${approval.id}] ${requestType} Requested – ${itemPartLabel(approval)}`;
+  const effectiveRecipientEmail = testRecipientEmail.trim() || recipient?.email;
 
   function send() {
     if (!recipient || !question.trim()) return;
+    if (sendingAccount.trim() && sendingAccount.trim() !== state.emailConnection.account) {
+      dispatch({ type: 'SET_EMAIL_CONNECTION', provider, account: sendingAccount.trim() });
+    }
     dispatch({
       type: 'FORWARD_TO_INTERNAL',
       approvalId: approval.id,
@@ -29,7 +35,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         id: genForwardId(),
         recipientName: recipient.name,
         recipientRole: recipient.role,
-        recipientEmail: recipient.email,
+        recipientEmail: effectiveRecipientEmail ?? recipient.email,
         requestType,
         question: question.trim(),
         attachments,
@@ -114,7 +120,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
             <p className="text-xs font-semibold text-slate">Email Preview</p>
             <div className="mt-2 space-y-1 text-xs text-navy">
               <p>
-                <span className="font-medium text-slate">To:</span> {recipient?.email ?? '—'}
+                <span className="font-medium text-slate">To:</span> {effectiveRecipientEmail ?? '—'}
               </p>
               <p>
                 <span className="font-medium text-slate">Subject:</span> {subjectLine}
@@ -126,9 +132,14 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
             </div>
           </div>
 
-          <div>
-            <label className="field-label">Send Via</label>
-            <div className="flex gap-2">
+          <div className="rounded-xl border border-line p-3">
+            <p className="text-sm font-semibold text-navy">Email Integration — Live Test</p>
+            <p className="mt-0.5 text-xs text-slate">
+              Connects a real Gmail or Outlook mailbox. Certra identifies the Approval ID from the subject line and
+              captures the reply automatically once it arrives — no manual copy/paste.
+            </p>
+
+            <div className="mt-3 flex gap-2">
               {(['Gmail', 'Outlook'] as const).map((p) => (
                 <button
                   key={p}
@@ -142,9 +153,30 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-xs text-slate">
-              Connected account: <span className="font-medium text-navy">{state.emailConnection.account ?? 'Not connected'}</span>
-            </p>
+
+            <div className="mt-3">
+              <label className="field-label">Sending Account</label>
+              <input
+                value={sendingAccount}
+                onChange={(e) => setSendingAccount(e.target.value)}
+                placeholder="you@company.com"
+                className="field-input"
+              />
+            </div>
+
+            <div className="mt-3">
+              <label className="field-label">Test Recipient Email (optional)</label>
+              <input
+                value={testRecipientEmail}
+                onChange={(e) => setTestRecipientEmail(e.target.value)}
+                placeholder="Override the recipient above for a live round-trip test"
+                className="field-input"
+              />
+              <p className="mt-1 text-xs text-slate">
+                Leave blank to send to {recipient ? recipient.email : 'the selected recipient'}. Set this to run a
+                real send → reply → auto-capture test against this approval.
+              </p>
+            </div>
           </div>
         </div>
 

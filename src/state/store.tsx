@@ -370,7 +370,7 @@ const initialState: State = {
     },
   ],
   toasts: [],
-  emailConnection: { provider: 'Gmail', account: 'harini.v@gem-mro.com' },
+  emailConnection: { provider: 'Gmail', account: 'khushi.work9471@gmail.com' },
 };
 
 interface StoreValue {
