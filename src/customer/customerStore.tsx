@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import type { Approval, Attachment, ConversationMessage } from '../types';
 import { INITIAL_APPROVALS } from '../data/seed';
 
-export const CUSTOMER_PERSONA = { id: 'cust-a', name: 'Sarah Mitchell', initials: 'SM' };
+export const CUSTOMER_PERSONA = { id: 'cust-a', name: 'Brian Whitman', initials: 'BW' };
 
 let idSeq = 5000;
 const genId = (prefix: string) => `${prefix}-${idSeq++}`;
