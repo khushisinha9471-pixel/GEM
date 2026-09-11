@@ -295,7 +295,12 @@ function reducer(state: State, action: Action): State {
         notifications: state.notifications.filter((n) => n.approvalId !== action.approvalId),
         toasts: [
           ...state.toasts,
-          { id: genId('toast'), title: 'Approval deleted', body: deleted?.id, tone: 'info' },
+          {
+            id: genId('toast'),
+            title: 'Approval deleted',
+            body: deleted ? `${deleted.type}${deleted.subtype ? ` — ${deleted.subtype}` : ''} removed.` : undefined,
+            tone: 'info',
+          },
         ],
       };
     }

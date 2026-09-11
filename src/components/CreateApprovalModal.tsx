@@ -89,7 +89,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
       toast: {
         id: `toast-${id}`,
         title: 'Approval created',
-        body: csmResponse.trim() ? `${id} created and customer notified of your message.` : `${id} created as Open.`,
+        body: csmResponse.trim() ? 'Approval created and customer notified of your message.' : 'Approval created as Open.',
         tone: 'success',
       },
     });
