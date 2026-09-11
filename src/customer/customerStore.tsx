@@ -40,34 +40,28 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-const DEFAULT_DECISION_TEXT: Record<CustomerDecision, string> = {
-  Approved: 'Approved.',
-  'Approved with Condition': 'Approved, subject to the condition noted.',
-  Rejected: 'Not approved.',
-  'Clarification Requested': 'Please provide more information before we can respond.',
-  'Negotiation Requested': "We'd like to discuss this further before deciding.",
-};
-
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'ADD_CUSTOMER_DECISION': {
-      const body = action.comment.trim() || DEFAULT_DECISION_TEXT[action.decision];
+      const comment = action.comment.trim();
       const approvals = state.approvals.map((a) => {
         if (a.id !== action.approvalId) return a;
-        const message: ConversationMessage = {
-          id: genId('msg'),
-          channel: 'customer',
-          authorName: CUSTOMER_PERSONA.name,
-          authorRole: 'Customer',
-          body,
-          date: nowIso(),
-          attachments: action.attachments,
-          decision: action.decision,
-        };
+        const message: ConversationMessage | null = comment
+          ? {
+              id: genId('msg'),
+              channel: 'customer',
+              authorName: CUSTOMER_PERSONA.name,
+              authorRole: 'Customer',
+              body: comment,
+              date: nowIso(),
+              attachments: action.attachments,
+              decision: action.decision,
+            }
+          : null;
         return {
           ...a,
           customerDecision: action.decision,
-          messages: [...a.messages, message],
+          messages: message ? [...a.messages, message] : a.messages,
           audit: [
             ...a.audit,
             {
@@ -75,7 +69,7 @@ function reducer(state: State, action: Action): State {
               date: nowIso(),
               actor: CUSTOMER_PERSONA.name,
               action: 'Customer responded',
-              detail: `Decision: ${action.decision}. ${body}`,
+              detail: `Decision: ${action.decision}.${comment ? ` ${comment}` : ''}`,
             },
           ],
         };

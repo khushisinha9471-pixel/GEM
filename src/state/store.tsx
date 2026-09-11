@@ -52,14 +52,6 @@ function updateApproval(state: State, id: string, fn: (a: Approval) => Approval)
   return state.approvals.map((a) => (a.id === id ? fn(a) : a));
 }
 
-const DEFAULT_DECISION_TEXT: Record<CustomerDecision, string> = {
-  Approved: 'Approved.',
-  'Approved with Condition': 'Approved, subject to the condition noted.',
-  Rejected: 'Not approved.',
-  'Clarification Requested': 'Please provide more information before we can respond.',
-  'Negotiation Requested': "We'd like to discuss this further before deciding.",
-};
-
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'CREATE_APPROVAL': {
@@ -89,26 +81,26 @@ function reducer(state: State, action: Action): State {
     }
     case 'ADD_CUSTOMER_DECISION': {
       let approvalLabel = action.approvalId;
-      const body = action.comment.trim() || DEFAULT_DECISION_TEXT[action.decision];
+      const comment = action.comment.trim();
       const approvals = updateApproval(state, action.approvalId, (a) => {
         approvalLabel = `${a.id} – ${a.subtype ?? a.type}`;
         const customerName = CUSTOMERS.find((c) => a.selectedCustomerIds.includes(c.id))?.name ?? CUSTOMERS[0].name;
-        return {
-          ...a,
-          customerDecision: action.decision,
-          messages: [
-            ...a.messages,
-            {
+        const message: ConversationMessage | null = comment
+          ? {
               id: genId('msg'),
               channel: 'customer',
               authorName: a.access === 'selected' ? customerName : 'Customer',
               authorRole: 'Customer',
-              body,
+              body: comment,
               date: nowIso(),
               attachments: action.attachments,
               decision: action.decision,
-            } as ConversationMessage,
-          ],
+            }
+          : null;
+        return {
+          ...a,
+          customerDecision: action.decision,
+          messages: message ? [...a.messages, message] : a.messages,
           audit: [
             ...a.audit,
             {
@@ -116,7 +108,7 @@ function reducer(state: State, action: Action): State {
               date: nowIso(),
               actor: 'Customer',
               action: 'Customer responded',
-              detail: `Decision: ${action.decision}. ${body}`,
+              detail: `Decision: ${action.decision}.${comment ? ` ${comment}` : ''}`,
             },
           ],
         };

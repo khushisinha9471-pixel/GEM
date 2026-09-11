@@ -390,17 +390,9 @@ export const INITIAL_APPROVALS: Approval[] = [
         date: '2026-09-07T15:30:00+05:30',
         attachments: [att('Bearing Wear Analysis.pdf', 'reports-library', '2026-09-06', { reportType: 'Engineering' })],
       }),
-      msg({
-        channel: 'customer',
-        authorName: 'David Chen',
-        authorRole: 'Customer',
-        body: 'Approved.',
-        date: '2026-09-07T19:10:00+05:30',
-        decision: 'Approved',
-      }),
     ],
     customerDecision: 'Approved',
-    extraAudit: [auditEvt('2026-09-07T19:10:00+05:30', 'David Chen', 'Customer responded', 'Approved.')],
+    extraAudit: [auditEvt('2026-09-07T19:10:00+05:30', 'David Chen', 'Customer responded', 'Decision: Approved.')],
   }),
 
   // APP-009 — open, Additional Repair, awaiting customer decision

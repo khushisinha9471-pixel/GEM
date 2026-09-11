@@ -170,8 +170,10 @@ export const ApprovalsTable: React.FC<{
                     <MessagePreview message={customerMsg} openable={customerColClickable} />
                   ) : customerColClickable ? (
                     <span className="text-sm font-medium text-amber-700">Click to add comment</span>
+                  ) : a.customerDecision ? (
+                    <span className="text-sm italic text-slate/60">No comment</span>
                   ) : (
-                    <span className="text-sm italic text-slate/60">Awaiting customer response</span>
+                    <span className="text-sm italic text-slate/60">Awaiting Customer response</span>
                   )}
                 </td>
 
