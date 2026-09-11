@@ -43,15 +43,15 @@ export const ApprovalsTable: React.FC<{
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-3 py-3.5">S.No.</th>
-            <th className="px-3 py-3.5">Type</th>
-            <th className="px-3 py-3.5">Subtype</th>
-            <th className="px-3 py-3.5">Item / Part</th>
-            <th className="px-3 py-3.5">Requirement</th>
-            <th className="px-3 py-3.5 text-right">Cost</th>
-            <th className="px-3 py-3.5">CSM Response</th>
-            <th className="px-3 py-3.5">{customerColumnLabel}</th>
-            <th className="px-3 py-3.5">Status</th>
+            <th className="px-3 py-3">S.No.</th>
+            <th className="px-3 py-3">Type</th>
+            <th className="px-3 py-3">Subtype</th>
+            <th className="px-3 py-3">Item / Part</th>
+            <th className="px-3 py-3">Requirement</th>
+            <th className="px-3 py-3 text-right">Cost</th>
+            <th className="px-3 py-3">CSM Response</th>
+            <th className="px-3 py-3">{customerColumnLabel}</th>
+            <th className="px-3 py-3">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -61,22 +61,22 @@ export const ApprovalsTable: React.FC<{
               onClick={() => onOpen(a)}
               className="cursor-pointer border-b border-line last:border-0 hover:bg-navy-50/40"
             >
-              <td className="px-3 py-4 align-top text-sm text-slate">
+              <td className="px-3 py-3 align-top text-sm text-slate">
                 <div className="font-medium text-navy">{idx + 1}</div>
                 <div className="mt-0.5 text-[11px] text-slate/80">{a.id}</div>
               </td>
-              <td className="break-words px-3 py-4 align-top text-sm font-medium text-navy">{a.type}</td>
-              <td className="break-words px-3 py-4 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
-              <td className="break-words px-3 py-4 align-top text-sm text-navy">{itemPartLabel(a)}</td>
-              <td className="px-3 py-4 align-top text-sm text-slate">{a.requirement}</td>
-              <td className="px-3 py-4 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
-              <td className="px-3 py-4 align-top">
+              <td className="break-words px-3 py-3 align-top text-sm font-medium text-navy">{a.type}</td>
+              <td className="break-words px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
+              <td className="break-words px-3 py-3 align-top text-sm text-navy">{itemPartLabel(a)}</td>
+              <td className="px-3 py-3 align-top text-sm text-slate">{a.requirement}</td>
+              <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
+              <td className="px-3 py-3 align-top">
                 <ResponseCell message={latestCsmResponse(a)} emptyLabel="No CSM response yet" />
               </td>
-              <td className="px-3 py-4 align-top">
+              <td className="px-3 py-3 align-top">
                 <ResponseCell message={latestCustomerResponse(a)} emptyLabel={customerEmptyLabel} />
               </td>
-              <td className="px-3 py-4 align-top">
+              <td className="px-3 py-3 align-top">
                 <StatusPill status={a.status} />
               </td>
             </tr>
