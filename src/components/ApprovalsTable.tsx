@@ -2,7 +2,7 @@ import React from 'react';
 import type { Approval, CustomerDecision } from '../types';
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDateTime } from '../utils/format';
-import { latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
+import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
 import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
@@ -146,18 +146,21 @@ export const ApprovalsTable: React.FC<{
                     approvalReqClickable && !a.customerDecision ? 'bg-amber-50/60' : ''
                   } ${approvalReqClickable && a.customerDecision ? 'hover:bg-navy-50/30' : ''}`}
                 >
-                  {a.customerDecision ? (
-                    <span
-                      title={approvalReqClickable ? 'Click to view conversation and change your response' : undefined}
-                      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${DECISION_STYLES[a.customerDecision]}`}
-                    >
-                      {a.customerDecision}
-                    </span>
-                  ) : role === 'customer' ? (
-                    <span className="text-sm font-medium text-amber-700">Click to respond</span>
-                  ) : (
-                    <span className="text-xs italic text-slate/60">Awaiting decision</span>
-                  )}
+                  <div>
+                    {a.customerDecision ? (
+                      <span
+                        title={approvalReqClickable ? 'Click to view conversation and change your response' : undefined}
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${DECISION_STYLES[a.customerDecision]}`}
+                      >
+                        {a.customerDecision}
+                      </span>
+                    ) : role === 'customer' ? (
+                      <span className="text-sm font-medium text-amber-700">Click to respond</span>
+                    ) : (
+                      <span className="text-xs italic text-slate/60">Awaiting decision</span>
+                    )}
+                    <div className="mt-1 text-[11px] font-medium text-slate">{formatDateTime(approvalRequestUpdatedAt(a))}</div>
+                  </div>
                 </td>
 
                 <td
