@@ -77,7 +77,7 @@ export const ApprovalsTable: React.FC<{
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
             const customerColClickable = role === 'customer';
-            const approvalReqClickable = role === 'customer' && !a.customerDecision;
+            const approvalReqClickable = role === 'customer';
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
@@ -142,10 +142,13 @@ export const ApprovalsTable: React.FC<{
 
                 <td
                   onClick={approvalReqClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${approvalReqClickable ? 'cursor-pointer bg-amber-50/60' : ''}`}
+                  className={`px-3 py-3 align-top ${approvalReqClickable ? 'cursor-pointer' : ''} ${
+                    approvalReqClickable && !a.customerDecision ? 'bg-amber-50/60' : ''
+                  } ${approvalReqClickable && a.customerDecision ? 'hover:bg-navy-50/30' : ''}`}
                 >
                   {a.customerDecision ? (
                     <span
+                      title={approvalReqClickable ? 'Click to view conversation and change your response' : undefined}
                       className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${DECISION_STYLES[a.customerDecision]}`}
                     >
                       {a.customerDecision}
