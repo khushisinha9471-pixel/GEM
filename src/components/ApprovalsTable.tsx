@@ -75,8 +75,12 @@ export const ApprovalsTable: React.FC<{
           {approvals.map((a, idx) => {
             const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
-            const gemClickable = role === 'csm';
-            const customerColClickable = role === 'customer';
+            // You reply to what the OTHER party said, not to your own already-sent
+            // message — so the CSM's entry point is the Customer Comment cell, and
+            // the customer's entry point is the GEM Comment cell. What gets recorded
+            // still lands in each side's own column, unchanged.
+            const customerCellClickable = role === 'csm';
+            const gemCellClickable = role === 'customer';
             const approvalReqClickable = role === 'customer' && !a.customerDecision;
 
             return (
@@ -158,30 +162,30 @@ export const ApprovalsTable: React.FC<{
                 </td>
 
                 <td
-                  onClick={customerColClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${customerColClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
-                    customerColClickable && !customerMsg ? 'bg-amber-50/60' : ''
+                  onClick={customerCellClickable ? () => onOpenConversation(a) : undefined}
+                  className={`px-3 py-3 align-top ${customerCellClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
+                    customerCellClickable && !customerMsg ? 'bg-amber-50/60' : ''
                   }`}
                 >
                   {customerMsg ? (
-                    <MessagePreview message={customerMsg} openable={customerColClickable} />
-                  ) : customerColClickable ? (
-                    <span className="text-sm font-medium text-amber-700">Click to add comment</span>
+                    <MessagePreview message={customerMsg} openable={customerCellClickable} />
+                  ) : customerCellClickable ? (
+                    <span className="text-sm font-medium text-amber-700">Click to view conversation</span>
                   ) : (
-                    <span className="text-sm italic text-slate/60">Awaiting customer response</span>
+                    <span className="text-sm italic text-slate/60">No response yet</span>
                   )}
                 </td>
 
                 <td
-                  onClick={gemClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${gemClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
-                    gemClickable && !gemMsg ? 'bg-amber-50/60' : ''
+                  onClick={gemCellClickable ? () => onOpenConversation(a) : undefined}
+                  className={`px-3 py-3 align-top ${gemCellClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
+                    gemCellClickable && !gemMsg ? 'bg-amber-50/60' : ''
                   }`}
                 >
                   {gemMsg ? (
-                    <MessagePreview message={gemMsg} openable={gemClickable} />
-                  ) : gemClickable ? (
-                    <span className="text-sm font-medium text-amber-700">Click to add comment</span>
+                    <MessagePreview message={gemMsg} openable={gemCellClickable} />
+                  ) : gemCellClickable ? (
+                    <span className="text-sm font-medium text-amber-700">Click to view conversation</span>
                   ) : (
                     <span className="text-sm italic text-slate/60">No response yet</span>
                   )}
