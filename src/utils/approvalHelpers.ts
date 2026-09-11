@@ -25,6 +25,18 @@ export function mergedConversation(a: Approval): ConversationMessage[] {
   return [...a.messages].sort((x, y) => (x.date < y.date ? -1 : 1));
 }
 
+// Matches the row number shown in the table's S.No. column for this approval:
+// its position in the currently filtered/sorted list, falling back to its
+// position in the full default-sorted list if it's no longer in view.
+export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: string | null): number | null {
+  if (!id) return null;
+  const idxFiltered = filtered.findIndex((a) => a.id === id);
+  if (idxFiltered >= 0) return idxFiltered + 1;
+  const base = [...approvals].sort((a, b) => b.seq - a.seq);
+  const idxBase = base.findIndex((a) => a.id === id);
+  return idxBase >= 0 ? idxBase + 1 : null;
+}
+
 export function searchableText(a: Approval): string {
   return [
     a.id,

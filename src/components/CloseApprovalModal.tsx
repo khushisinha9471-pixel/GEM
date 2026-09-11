@@ -4,7 +4,11 @@ import type { Approval, FinalOutcome } from '../types';
 import { FINAL_OUTCOMES } from '../types';
 import { useStore } from '../state/store';
 
-export const CloseApprovalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
+export const CloseApprovalModal: React.FC<{ approval: Approval; serial: number; onClose: () => void }> = ({
+  approval,
+  serial,
+  onClose,
+}) => {
   const { dispatch } = useStore();
   const [outcome, setOutcome] = React.useState<FinalOutcome | ''>('');
 
@@ -20,7 +24,7 @@ export const CloseApprovalModal: React.FC<{ approval: Approval; onClose: () => v
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={18} className="text-navy" />
-            <h2 className="text-base font-semibold text-navy">Close Approval — {approval.id}</h2>
+            <h2 className="text-base font-semibold text-navy">Close Approval — #{serial}</h2>
           </div>
           <button onClick={onClose} className="rounded-full p-1.5 text-slate hover:bg-surface hover:text-navy">
             <X size={18} />

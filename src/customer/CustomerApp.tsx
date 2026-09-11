@@ -7,7 +7,7 @@ import { CustomerToolbar, DEFAULT_CUSTOMER_FILTERS, type CustomerFilters } from 
 import { ApprovalsTable } from '../components/ApprovalsTable';
 import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
-import { searchableText } from '../utils/approvalHelpers';
+import { searchableText, serialNumberOf } from '../utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from '../types';
 
 const CustomerAppShell: React.FC = () => {
@@ -31,6 +31,7 @@ const CustomerAppShell: React.FC = () => {
     .sort((a, b) => b.seq - a.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
+  const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -68,7 +69,11 @@ const CustomerAppShell: React.FC = () => {
       <CustomerToastContainer />
 
       {selectedApproval && (
-        <CustomerApprovalDetail approval={selectedApproval} onClose={() => setSelectedApprovalId(null)} />
+        <CustomerApprovalDetail
+          approval={selectedApproval}
+          serial={selectedSerial ?? 0}
+          onClose={() => setSelectedApprovalId(null)}
+        />
       )}
     </div>
   );

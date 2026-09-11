@@ -10,7 +10,7 @@ import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
 import { NotifyCustomerModal } from './components/NotifyCustomerModal';
 import { CloseApprovalModal } from './components/CloseApprovalModal';
-import { searchableText } from './utils/approvalHelpers';
+import { searchableText, serialNumberOf } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 
 const AppShell: React.FC = () => {
@@ -39,6 +39,8 @@ const AppShell: React.FC = () => {
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
   const closeApproval = approvals.find((a) => a.id === closeApprovalId) ?? null;
+  const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
+  const closeSerial = serialNumberOf(approvals, filtered, closeApprovalId);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -90,6 +92,7 @@ const AppShell: React.FC = () => {
       {selectedApproval && (
         <ApprovalDetailPanel
           approval={selectedApproval}
+          serial={selectedSerial ?? 0}
           onClose={() => setSelectedApprovalId(null)}
           onNotify={(id) => setNotifyOpen({ open: true, approvalId: id })}
           onRequestClose={(id) => setCloseApprovalId(id)}
@@ -103,7 +106,9 @@ const AppShell: React.FC = () => {
         />
       )}
 
-      {closeApproval && <CloseApprovalModal approval={closeApproval} onClose={() => setCloseApprovalId(null)} />}
+      {closeApproval && (
+        <CloseApprovalModal approval={closeApproval} serial={closeSerial ?? 0} onClose={() => setCloseApprovalId(null)} />
+      )}
     </div>
   );
 };

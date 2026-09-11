@@ -3,11 +3,12 @@ import { X, Trash2, TriangleAlert } from 'lucide-react';
 import type { Approval } from '../types';
 import { useStore } from '../state/store';
 
-export const DeleteApprovalModal: React.FC<{ approval: Approval; onClose: () => void; onDeleted: () => void }> = ({
-  approval,
-  onClose,
-  onDeleted,
-}) => {
+export const DeleteApprovalModal: React.FC<{
+  approval: Approval;
+  serial: number;
+  onClose: () => void;
+  onDeleted: () => void;
+}> = ({ approval, serial, onClose, onDeleted }) => {
   const { dispatch } = useStore();
 
   function confirmDelete() {
@@ -29,7 +30,7 @@ export const DeleteApprovalModal: React.FC<{ approval: Approval; onClose: () => 
         </div>
         <div className="px-5 py-5">
           <p className="text-sm text-navy">
-            Delete <span className="font-semibold">{approval.id}</span> — {approval.type}
+            Delete <span className="font-semibold">#{serial}</span> — {approval.type}
             {approval.subtype ? ` — ${approval.subtype}` : ''}?
           </p>
           <p className="mt-2 text-sm text-slate">
