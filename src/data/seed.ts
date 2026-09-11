@@ -403,14 +403,14 @@ export const INITIAL_APPROVALS: Approval[] = [
     extraAudit: [auditEvt('2026-09-07T19:10:00+05:30', 'David Chen', 'Customer responded', 'Approved.')],
   }),
 
-  // APP-009 — open, Price Deviation, awaiting customer decision
+  // APP-009 — open, Additional Repair, awaiting customer decision
   build({
     seq: 9,
     type: 'O&A',
-    subtype: 'Price Deviation',
+    subtype: 'Additional Repair',
     partNumber: '229981',
     partDescription: 'LPT Blade',
-    requirement: 'The repair cost is higher than quoted because extra material was needed. Please approve this price change.',
+    requirement: 'The LPT blade needs extra repair beyond the original scope, based on the inspection findings. We need your approval before we can proceed.',
     cost: 5400,
     status: 'Open',
     createdAt: '2026-09-09T09:00:00+05:30',
@@ -419,9 +419,9 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Please review the attached cost breakdown for the price deviation and confirm approval.',
+        body: 'Please review the attached inspection findings and confirm whether the additional repair may proceed.',
         date: '2026-09-09T09:20:00+05:30',
-        attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
+        attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-08', { reportType: 'Inspection' })],
       }),
     ],
   }),
