@@ -31,7 +31,7 @@ export const ApprovalsTable: React.FC<{
     <div className="card overflow-x-auto">
       <table className="w-full min-w-[1080px] table-fixed border-collapse text-left">
         <colgroup>
-          <col className="w-[48px]" />
+          <col className="w-[90px]" />
           <col className="w-[168px]" />
           <col className="w-[122px]" />
           <col className="w-[140px]" />
@@ -43,7 +43,7 @@ export const ApprovalsTable: React.FC<{
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-3 py-3">S.No.</th>
+            <th className="px-3 py-3">Approval #</th>
             <th className="px-3 py-3">Type</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Item / Part</th>
@@ -55,16 +55,13 @@ export const ApprovalsTable: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {approvals.map((a, idx) => (
+          {approvals.map((a) => (
             <tr
               key={a.id}
               onClick={() => onOpen(a)}
               className="cursor-pointer border-b border-line last:border-0 hover:bg-navy-50/40"
             >
-              <td className="px-3 py-3 align-top text-sm text-slate">
-                <div className="font-medium text-navy">{idx + 1}</div>
-                <div className="mt-0.5 text-[11px] text-slate/80">{a.id}</div>
-              </td>
+              <td className="px-3 py-3 align-top text-sm font-medium text-navy">{a.id}</td>
               <td className="break-words px-3 py-3 align-top text-sm font-medium text-navy">{a.type}</td>
               <td className="break-words px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
               <td className="break-words px-3 py-3 align-top text-sm text-navy">{itemPartLabel(a)}</td>
