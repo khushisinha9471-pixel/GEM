@@ -37,7 +37,7 @@ const CustomerAppShell: React.FC = () => {
     <div className="min-h-screen bg-surface">
       <CustomerHeader onOpenApproval={setSelectedApprovalId} />
 
-      <main className="mx-auto max-w-[1440px] px-6 py-6">
+      <main className="w-full px-8 py-6">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:gap-8">
           <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
           <div>
