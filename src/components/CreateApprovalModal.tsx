@@ -80,6 +80,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
         },
       ],
       outcome: null,
+      customerDecision: null,
     };
 
     dispatch({ type: 'CREATE_APPROVAL', approval });

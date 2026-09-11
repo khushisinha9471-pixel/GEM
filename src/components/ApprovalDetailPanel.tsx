@@ -1,48 +1,58 @@
 import React from 'react';
-import { X, ShieldCheck, Send, CheckCircle2, RotateCcw, FlaskConical, Trash2 } from 'lucide-react';
-import type { Approval, Attachment, ConversationMessage } from '../types';
+import {
+  X,
+  ShieldCheck,
+  Send,
+  CheckCircle2,
+  RotateCcw,
+  FlaskConical,
+  Trash2,
+  Clock,
+  MessagesSquare,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
+import type { Approval, Attachment } from '../types';
 import { StatusPill, OutcomeBadge } from './StatusPill';
-import { formatCost, itemPartLabel } from '../utils/format';
-import { customerVisibleMessages } from '../utils/approvalHelpers';
+import { formatCost, formatDateTime, itemPartLabel } from '../utils/format';
+import { mergedConversation } from '../utils/approvalHelpers';
 import { ConversationThread } from './ConversationThread';
-import { InternalDiscussionPanel } from './InternalDiscussionPanel';
 import { ApprovalAttachmentsView } from './ApprovalAttachmentsView';
 import { AuditTrailView } from './AuditTrailView';
 import { AccessModal } from './AccessModal';
-import { CloseApprovalModal } from './CloseApprovalModal';
 import { ForwardToInternalModal } from './ForwardToInternalModal';
-import { ShareEngineerResponseModal } from './ShareEngineerResponseModal';
-import { DeleteApprovalModal } from './DeleteApprovalModal';
 import { AttachmentManager } from './AttachmentManager';
+import { DeleteApprovalModal } from './DeleteApprovalModal';
 import { useStore } from '../state/store';
 import { CUSTOMERS } from '../data/seed';
 
-type Tab = 'conversation' | 'internal' | 'attachments' | 'audit';
+type Tab = 'conversation' | 'attachments' | 'audit';
 
-const SIMULATED_CUSTOMER_REPLIES = [
-  'Thank you, please proceed.',
-  'We need more information before we can approve this.',
-  'Can you confirm the revised cost impact?',
-  'We will supply an alternative part.',
+const SIMULATED_REPLIES = [
+  'We recommend replacing the part rather than proceeding with the proposed repair.',
+  'Reviewed the findings — repair is acceptable within limits; proceed as originally scoped.',
+  'Recommend obtaining an updated borescope image before making a final call.',
+  'Cost looks in line with prior similar events — no objection from a cost standpoint.',
 ];
 
 export const ApprovalDetailPanel: React.FC<{
   approval: Approval;
   onClose: () => void;
   onNotify: (approvalId: string) => void;
-}> = ({ approval, onClose, onNotify }) => {
+  onRequestClose: (approvalId: string) => void;
+}> = ({ approval, onClose, onNotify, onRequestClose }) => {
   const { dispatch } = useStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
   const [accessOpen, setAccessOpen] = React.useState(false);
-  const [closeOpen, setCloseOpen] = React.useState(false);
   const [forwardOpen, setForwardOpen] = React.useState(false);
-  const [shareMessage, setShareMessage] = React.useState<ConversationMessage | null>(null);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [expandedHistory, setExpandedHistory] = React.useState<Set<string>>(new Set());
 
   const [replyBody, setReplyBody] = React.useState('');
   const [replyAttachments, setReplyAttachments] = React.useState<Attachment[]>([]);
 
-  const visibleMessages = customerVisibleMessages(approval);
+  const feed = mergedConversation(approval);
+  const awaiting = approval.forwardRequests.filter((f) => f.status === 'awaiting');
   const accessLabel =
     approval.access === 'all'
       ? 'All Mapped Customers'
@@ -55,9 +65,18 @@ export const ApprovalDetailPanel: React.FC<{
     setReplyAttachments([]);
   }
 
-  function simulateCustomerReply() {
-    const body = SIMULATED_CUSTOMER_REPLIES[Math.floor(Math.random() * SIMULATED_CUSTOMER_REPLIES.length)];
-    dispatch({ type: 'SIMULATE_CUSTOMER_REPLY', approvalId: approval.id, body });
+  function simulateReply(forwardRequestId: string) {
+    const body = SIMULATED_REPLIES[Math.floor(Math.random() * SIMULATED_REPLIES.length)];
+    dispatch({ type: 'SIMULATE_MAILBOX_REPLY', approvalId: approval.id, forwardRequestId, body });
+  }
+
+  function toggleHistory(id: string) {
+    setExpandedHistory((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }
 
   return (
@@ -98,7 +117,7 @@ export const ApprovalDetailPanel: React.FC<{
               Notify Customer
             </button>
             {approval.status === 'Open' ? (
-              <button onClick={() => setCloseOpen(true)} className="btn-primary">
+              <button onClick={() => onRequestClose(approval.id)} className="btn-primary">
                 <CheckCircle2 size={14} />
                 Close Approval
               </button>
@@ -122,8 +141,7 @@ export const ApprovalDetailPanel: React.FC<{
         <div className="flex border-b border-line px-6">
           {(
             [
-              ['conversation', 'Customer Conversation'],
-              ['internal', 'Internal Discussion'],
+              ['conversation', 'Conversation'],
               ['attachments', 'Attachments'],
               ['audit', 'Audit Trail'],
             ] as [Tab, string][]
@@ -144,24 +162,64 @@ export const ApprovalDetailPanel: React.FC<{
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {tab === 'conversation' && (
             <div className="space-y-5">
-              <div className="rounded-lg border border-dashed border-line bg-surface/30 px-3 py-2 text-xs text-slate">
-                Customer-visible thread — internal discussion stays private unless explicitly shared.
-              </div>
-              <ConversationThread messages={visibleMessages} emptyLabel="No customer conversation yet." />
-
-              <div className="flex items-center gap-2 border-t border-line pt-4">
-                <button
-                  onClick={simulateCustomerReply}
-                  className="flex items-center gap-1.5 rounded-lg border border-dashed border-line px-2.5 py-1.5 text-xs font-medium text-slate hover:bg-surface"
-                  title="Test capability: simulate the customer replying via the Customer Portal"
-                >
-                  <FlaskConical size={13} />
-                  Simulate Customer Reply (Test)
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-slate">
+                  Customer-visible messages and internal replies in one thread — internal-only messages are badged and
+                  stay private.
+                </p>
+                <button onClick={() => setForwardOpen(true)} className="btn-secondary flex-none">
+                  <Send size={14} />
+                  Forward to Internal Member
                 </button>
               </div>
 
+              <ConversationThread messages={feed} emptyLabel="No conversation yet." />
+
+              {awaiting.map((f) => (
+                <div key={f.id} className="rounded-xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-800">
+                        <Clock size={13} />
+                        Awaiting response from {f.recipientName} ({f.recipientRole})
+                      </div>
+                      <p className="mt-1 text-xs text-slate">
+                        {f.requestType} request sent via {f.sentVia} on {formatDateTime(f.sentAt)}
+                        {f.ccCustomer ? ' — customer cc\'d' : ' — internal only'}
+                      </p>
+                      <p className="mt-1 text-xs italic text-slate">&ldquo;{f.question}&rdquo;</p>
+                    </div>
+                    <button
+                      onClick={() => simulateReply(f.id)}
+                      className="flex flex-none items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+                      title="Test capability: simulate the internal recipient replying from their test mailbox"
+                    >
+                      <FlaskConical size={13} />
+                      Simulate Test Mailbox Reply
+                    </button>
+                  </div>
+                  {f.includeHistory && (f.includedMessages?.length ?? 0) > 0 && (
+                    <div className="mt-2 border-t border-amber-200/70 pt-2">
+                      <button
+                        onClick={() => toggleHistory(f.id)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-amber-800 hover:underline"
+                      >
+                        <MessagesSquare size={12} />
+                        Full conversation included ({f.includedMessages!.length} message{f.includedMessages!.length === 1 ? '' : 's'})
+                        {expandedHistory.has(f.id) ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      </button>
+                      {expandedHistory.has(f.id) && (
+                        <div className="mt-2 max-h-56 overflow-y-auto rounded-lg bg-white/70 p-3">
+                          <ConversationThread messages={f.includedMessages!} emptyLabel="No conversation was included." />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+
               <div className="rounded-xl border border-line p-4">
-                <label className="field-label">CSM Response</label>
+                <label className="field-label">GEM Response</label>
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
@@ -182,10 +240,6 @@ export const ApprovalDetailPanel: React.FC<{
             </div>
           )}
 
-          {tab === 'internal' && (
-            <InternalDiscussionPanel approval={approval} onForward={() => setForwardOpen(true)} onShare={setShareMessage} />
-          )}
-
           {tab === 'attachments' && <ApprovalAttachmentsView approval={approval} />}
 
           {tab === 'audit' && <AuditTrailView approval={approval} />}
@@ -193,14 +247,8 @@ export const ApprovalDetailPanel: React.FC<{
       </div>
 
       {accessOpen && <AccessModal approval={approval} onClose={() => setAccessOpen(false)} />}
-      {closeOpen && <CloseApprovalModal approval={approval} onClose={() => setCloseOpen(false)} />}
       {forwardOpen && <ForwardToInternalModal approval={approval} onClose={() => setForwardOpen(false)} />}
-      {shareMessage && (
-        <ShareEngineerResponseModal approval={approval} message={shareMessage} onClose={() => setShareMessage(null)} />
-      )}
-      {deleteOpen && (
-        <DeleteApprovalModal approval={approval} onClose={() => setDeleteOpen(false)} onDeleted={onClose} />
-      )}
+      {deleteOpen && <DeleteApprovalModal approval={approval} onClose={() => setDeleteOpen(false)} onDeleted={onClose} />}
     </div>
   );
 };

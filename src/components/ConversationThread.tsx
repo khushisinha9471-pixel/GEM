@@ -1,6 +1,6 @@
 import React from 'react';
-import { Paperclip, Mail, Share2 } from 'lucide-react';
-import type { ConversationMessage } from '../types';
+import { Paperclip, Mail, Lock } from 'lucide-react';
+import type { ConversationMessage, CustomerDecision } from '../types';
 import { formatDateTime } from '../utils/format';
 
 const roleStyles: Record<string, { bubble: string; align: string; label: string }> = {
@@ -9,47 +9,54 @@ const roleStyles: Record<string, { bubble: string; align: string; label: string 
   Internal: { bubble: 'bg-amber-50 text-navy border border-amber-200', align: 'items-start', label: 'text-amber-700' },
 };
 
+const DECISION_BADGE_STYLES: Record<CustomerDecision, string> = {
+  Approved: 'bg-emerald-50 text-emerald-700',
+  Rejected: 'bg-red-50 text-red-700',
+  'Clarification Requested': 'bg-amber-50 text-amber-700',
+  'Negotiation Requested': 'bg-amber-50 text-amber-700',
+};
+
 export const MessageBubble: React.FC<{ message: ConversationMessage }> = ({ message }) => {
-  const isShared = message.channel === 'shared-to-customer';
+  const isInternalOnly = message.channel === 'internal';
   const style = roleStyles[message.authorRole] ?? roleStyles.Customer;
-  const isCsm = message.authorRole === 'CSM' && !isShared;
+  const isCsm = message.authorRole === 'CSM';
 
   return (
     <div className={`flex flex-col ${isCsm ? 'items-end' : 'items-start'}`}>
-      <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold">
+      <div className="mb-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold">
         <span className={style.label}>
           {message.authorName}
           {message.authorTitle ? ` — ${message.authorTitle}` : ''}
         </span>
+        {message.decision && (
+          <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${DECISION_BADGE_STYLES[message.decision]}`}>
+            {message.decision}
+          </span>
+        )}
         {message.capturedFromEmail && (
           <span className="inline-flex items-center gap-0.5 rounded-full bg-navy-50 px-1.5 py-0.5 text-[10px] font-medium text-navy">
             <Mail size={10} /> Captured automatically from email
           </span>
         )}
-        {isShared && (
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-            <Share2 size={10} /> Shared by {message.sharedByCsmName ?? 'CSM'}
+        {isInternalOnly && (
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-slate/10 px-1.5 py-0.5 text-[10px] font-medium text-slate">
+            <Lock size={10} /> Internal only
           </span>
         )}
       </div>
       <div
         className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-          isShared ? 'border border-emerald-200 bg-emerald-50 text-navy' : isCsm ? 'bg-navy text-white' : 'border border-line bg-white text-navy'
+          isCsm ? 'bg-navy text-white' : isInternalOnly ? 'border border-amber-200 bg-amber-50 text-navy' : 'border border-line bg-white text-navy'
         }`}
       >
         <p className="whitespace-pre-wrap">{message.body}</p>
-        {message.sharedContext && (
-          <p className={`mt-2 border-t pt-2 text-xs italic ${isShared ? 'border-emerald-200 text-navy/80' : 'border-white/20 text-white/80'}`}>
-            CSM note: {message.sharedContext}
-          </p>
-        )}
         {message.attachments.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {message.attachments.map((a) => (
               <span
                 key={a.id}
                 className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium ${
-                  isCsm && !isShared ? 'bg-white/15 text-white' : 'bg-surface text-navy'
+                  isCsm ? 'bg-white/15 text-white' : 'bg-surface text-navy'
                 }`}
               >
                 <Paperclip size={10} />

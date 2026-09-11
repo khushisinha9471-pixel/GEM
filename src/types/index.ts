@@ -1,6 +1,6 @@
 export type ApprovalType = 'O&A' | 'Purchase' | 'Engineering Request' | 'Invoice Acknowledgement';
 
-export type OASubtype = 'Additional Repair' | 'Additional Replace' | 'Exchange' | 'Price Deviation' | 'Carry Forward';
+export type OASubtype = 'Additional Repair' | 'Additional Replace' | 'Exchange' | 'Price Deviation';
 export type PurchaseSubtype = 'LLP Purchase' | 'Customer Provided Part';
 export type Subtype = OASubtype | PurchaseSubtype | null;
 
@@ -16,10 +16,12 @@ export type FinalOutcome =
   | 'Acknowledged'
   | 'Payment Timing Confirmed';
 
+export type CustomerDecision = 'Approved' | 'Rejected' | 'Clarification Requested' | 'Negotiation Requested';
+
 export const APPROVAL_TYPES: ApprovalType[] = ['O&A', 'Purchase', 'Engineering Request', 'Invoice Acknowledgement'];
 
 export const SUBTYPES_BY_TYPE: Record<ApprovalType, string[]> = {
-  'O&A': ['Additional Repair', 'Additional Replace', 'Exchange', 'Price Deviation', 'Carry Forward'],
+  'O&A': ['Additional Repair', 'Additional Replace', 'Exchange', 'Price Deviation'],
   Purchase: ['LLP Purchase', 'Customer Provided Part'],
   'Engineering Request': [],
   'Invoice Acknowledgement': [],
@@ -36,6 +38,13 @@ export const FINAL_OUTCOMES: FinalOutcome[] = [
   'Payment Timing Confirmed',
 ];
 
+export const CUSTOMER_DECISIONS: CustomerDecision[] = [
+  'Approved',
+  'Rejected',
+  'Clarification Requested',
+  'Negotiation Requested',
+];
+
 export interface Attachment {
   id: string;
   name: string;
@@ -46,7 +55,7 @@ export interface Attachment {
   date: string; // ISO
 }
 
-export type MessageChannel = 'customer' | 'internal' | 'shared-to-customer';
+export type MessageChannel = 'customer' | 'internal';
 export type MessageAuthorRole = 'CSM' | 'Customer' | 'Internal';
 
 export interface ConversationMessage {
@@ -59,10 +68,7 @@ export interface ConversationMessage {
   date: string; // ISO
   attachments: Attachment[];
   capturedFromEmail?: boolean;
-  sharedFromMessageId?: string; // if this is a shared-to-customer echo of an internal message
-  sharedByCsmName?: string;
-  sharedContext?: string;
-  internalDecision?: 'shared' | 'kept-internal';
+  decision?: CustomerDecision; // set on the customer message that recorded a decision
 }
 
 export interface InternalForwardRequest {
@@ -79,6 +85,7 @@ export interface InternalForwardRequest {
   responseMessageId?: string;
   includeHistory?: boolean;
   includedMessages?: ConversationMessage[]; // snapshot of the customer conversation at send time, when includeHistory is true
+  ccCustomer: boolean; // when true, this thread (and any captured reply) is customer-visible
 }
 
 export interface AuditEvent {
@@ -113,6 +120,7 @@ export interface Approval {
   audit: AuditEvent[];
   outcome: FinalOutcome | null;
   closedAt?: string;
+  customerDecision: CustomerDecision | null;
 }
 
 export interface Customer {

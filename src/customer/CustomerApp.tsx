@@ -47,7 +47,8 @@ const CustomerAppShell: React.FC = () => {
         </div>
 
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-          <div>
+          <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
+          <div className="lg:text-right">
             <h1 className="text-[26px] font-bold tracking-tight text-navy">Approvals</h1>
             <p className="mt-1 text-sm text-slate">
               <span className="font-semibold text-navy">Work Order:</span> {WORK_ORDER.id}
@@ -55,7 +56,6 @@ const CustomerAppShell: React.FC = () => {
               <span className="font-semibold text-navy">Engine:</span> {WORK_ORDER.engineModel} | ESN {WORK_ORDER.esn}
             </p>
           </div>
-          <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
         </div>
 
         <div className="mb-4">
@@ -68,9 +68,9 @@ const CustomerAppShell: React.FC = () => {
 
         <ApprovalsTable
           approvals={filtered}
-          onOpen={(a: Approval) => setSelectedApprovalId(a.id)}
-          customerColumnLabel="Your Response"
-          customerEmptyLabel="Awaiting your response"
+          role="customer"
+          onOpenConversation={(a: Approval) => setSelectedApprovalId(a.id)}
+          customerColumnLabel="Your Comment"
         />
       </main>
 

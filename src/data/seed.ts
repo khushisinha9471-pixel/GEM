@@ -92,6 +92,7 @@ interface Draft {
   extraAudit?: AuditEvent[];
   outcome?: Approval['outcome'];
   closedAt?: string;
+  customerDecision?: Approval['customerDecision'];
 }
 
 function build(d: Draft): Approval {
@@ -115,6 +116,7 @@ function build(d: Draft): Approval {
     audit: [...baseAudit(id, d.createdAt, d.type, d.subtype), ...(d.extraAudit ?? [])],
     outcome: d.outcome ?? null,
     closedAt: d.closedAt,
+    customerDecision: d.customerDecision ?? null,
   };
 }
 
@@ -123,7 +125,7 @@ const app001Messages: ConversationMessage[] = [
     channel: 'customer',
     authorName: 'Harini V',
     authorRole: 'CSM',
-    body: 'Additional repair is required based on inspection findings. Please review the additional repair requirement and confirm whether the repair may proceed.',
+    body: 'Please review the additional repair requirement above and confirm whether we may proceed.',
     date: '2026-09-10T10:15:00+05:30',
     attachments: [att('Inspection Report.pdf', 'reports-library', '2026-09-10', { reportType: 'Inspection' }), att('Findings Summary.pdf', 'external', '2026-09-10', { uploadedBy: 'Harini V' })],
   }),
@@ -134,6 +136,7 @@ const app001Messages: ConversationMessage[] = [
     body: "Can we get an engineer's recommendation before approving this?",
     date: '2026-09-10T14:20:00+05:30',
     attachments: [att('Query_Notes.pdf', 'external', '2026-09-10', { uploadedBy: 'Sarah Mitchell' })],
+    decision: 'Clarification Requested',
   }),
   msg({
     channel: 'customer',
@@ -158,6 +161,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     status: 'Open',
     createdAt: '2026-09-10T09:45:00+05:30',
     messages: app001Messages,
+    customerDecision: 'Clarification Requested',
     forwardRequests: [
       {
         id: 'fwd-1',
@@ -173,12 +177,13 @@ export const INITIAL_APPROVALS: Approval[] = [
         status: 'awaiting',
         includeHistory: true,
         includedMessages: app001Messages,
+        ccCustomer: true,
       },
     ],
     extraAudit: [
       auditEvt('2026-09-10T10:15:00+05:30', 'Harini V (CSM)', 'Customer response requested', 'Initial CSM message sent to customer.'),
-      auditEvt('2026-09-10T14:20:00+05:30', 'Sarah Mitchell', 'Customer responded', 'Customer requested engineering recommendation.'),
-      auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Muazzi (Engineering VP) via Gmail — Repair Recommendation.'),
+      auditEvt('2026-09-10T14:20:00+05:30', 'Sarah Mitchell', 'Customer responded', 'Clarification Requested — customer requested engineering recommendation.'),
+      auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Muazzi (Engineering VP) via Gmail — Repair Recommendation. Customer cc\'d.'),
     ],
   }),
 
@@ -198,7 +203,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Replacement details shared.',
+        body: 'Please review the replacement recommendation below and confirm your approval.',
         date: '2026-09-05T11:00:00+05:30',
         attachments: [att('Fan Blade Condition Report.pdf', 'reports-library', '2026-09-04', { reportType: 'Inspection' })],
       }),
@@ -208,111 +213,26 @@ export const INITIAL_APPROVALS: Approval[] = [
         authorRole: 'Customer',
         body: 'Approved.',
         date: '2026-09-05T16:40:00+05:30',
+        decision: 'Approved',
       }),
     ],
     outcome: 'Approved',
+    customerDecision: 'Approved',
     closedAt: '2026-09-06T09:00:00+05:30',
     extraAudit: [
-      auditEvt('2026-09-05T16:40:00+05:30', 'David Chen', 'Customer responded', 'Customer approved the replacement.'),
+      auditEvt('2026-09-05T16:40:00+05:30', 'David Chen', 'Customer responded', 'Approved.'),
       auditEvt('2026-09-06T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Approved.'),
     ],
   }),
 
-  // APP-003
+  // APP-003 — open, Exchange, awaiting customer decision
   build({
     seq: 3,
-    type: 'Purchase',
-    subtype: 'LLP Purchase',
-    partNumber: '456789',
-    partDescription: 'HPT Disk',
-    requirement: 'LLP replacement requires customer approval and records review before procurement can proceed.',
-    cost: 95000,
-    status: 'Open',
-    createdAt: '2026-09-07T10:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'LLP purchase details and supporting records shared for review.',
-        date: '2026-09-07T10:30:00+05:30',
-        attachments: [att('LLP Records Package.pdf', 'reports-library', '2026-09-07', { reportType: 'Records' })],
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'Priya Patel',
-        authorRole: 'Customer',
-        body: 'Please provide the BTB package.',
-        date: '2026-09-08T09:15:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-004
-  build({
-    seq: 4,
-    type: 'Purchase',
-    subtype: 'Customer Provided Part',
-    partNumber: '345678',
-    partDescription: 'LPT Blade',
-    requirement: 'Customer will provide an alternative replacement part in lieu of shop-sourced material.',
-    cost: null,
-    status: 'Open',
-    createdAt: '2026-09-08T12:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Please confirm the customer-provided part details.',
-        date: '2026-09-08T12:20:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'We will provide the part.',
-        date: '2026-09-08T17:00:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-005
-  build({
-    seq: 5,
-    type: 'Engineering Request',
-    subtype: null,
-    engineeringItem: 'Engine Test',
-    requirement: 'Additional troubleshooting required following anomalous test cell readings.',
-    cost: null,
-    status: 'Open',
-    createdAt: '2026-09-09T08:30:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Engineering review requested.',
-        date: '2026-09-09T09:00:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'Sarah Mitchell',
-        authorRole: 'Customer',
-        body: 'Please provide engineering clarification.',
-        date: '2026-09-09T13:45:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-006
-  build({
-    seq: 6,
     type: 'O&A',
     subtype: 'Exchange',
     partNumber: '552341',
     partDescription: 'LPT Nozzle',
-    requirement: 'LPT nozzle segment exchange recommended in lieu of repair due to extent of thermal distress.',
+    requirement: 'LPT nozzle segment shows thermal distress beyond repairable limits and requires exchange for a serviceable unit.',
     cost: 18400,
     status: 'Open',
     createdAt: '2026-09-06T09:20:00+05:30',
@@ -321,28 +241,21 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Exchange option proposed for the LPT nozzle segment — please review.',
+        body: 'Please review the proposed exchange and let us know if you approve.',
         date: '2026-09-06T09:40:00+05:30',
         attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-06', { reportType: 'Inspection' })],
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'What is the lead time on the exchange unit?',
-        date: '2026-09-06T15:10:00+05:30',
       }),
     ],
   }),
 
-  // APP-007
+  // APP-004 — open, Price Deviation, awaiting customer decision
   build({
-    seq: 7,
+    seq: 4,
     type: 'O&A',
     subtype: 'Price Deviation',
     partNumber: '991823',
     partDescription: 'Combustion Liner',
-    requirement: 'Repair cost exceeds original quoted price due to revised labor estimate — customer approval required for the deviation.',
+    requirement: 'Repair cost exceeds the original quoted price due to a revised labor estimate; approval is required for the price deviation.',
     cost: 6300,
     status: 'Open',
     createdAt: '2026-09-08T09:00:00+05:30',
@@ -351,68 +264,16 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Price deviation details attached for your review and approval.',
+        body: 'Please review the attached cost breakdown and confirm the price deviation is acceptable.',
         date: '2026-09-08T09:30:00+05:30',
         attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
       }),
     ],
   }),
 
-  // APP-008
+  // APP-005 — closed, Carry Forward scenario
   build({
-    seq: 8,
-    type: 'O&A',
-    subtype: 'Carry Forward',
-    partNumber: '118820',
-    partDescription: 'Fan Case',
-    requirement: 'Minor fan case damage is within carry-forward limits per manual — proposing carry forward rather than repair at this visit.',
-    cost: null,
-    status: 'Open',
-    createdAt: '2026-09-09T11:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Proposing to carry forward the fan case finding — within manual limits. Please confirm.',
-        date: '2026-09-09T11:20:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-009
-  build({
-    seq: 9,
-    type: 'Purchase',
-    subtype: 'LLP Purchase',
-    partNumber: '224455',
-    partDescription: 'HPT Disk Stage 2',
-    requirement: 'Stage 2 HPT disk has reached life limit and requires LLP purchase and customer approval prior to procurement.',
-    cost: 112000,
-    status: 'Open',
-    createdAt: '2026-09-04T09:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'LLP purchase required — records and pricing attached.',
-        date: '2026-09-04T09:45:00+05:30',
-        attachments: [att('LLP Records Package.pdf', 'reports-library', '2026-09-07', { reportType: 'Records' })],
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'David Chen',
-        authorRole: 'Customer',
-        body: 'Reviewing with our records team, will revert shortly.',
-        date: '2026-09-05T10:00:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-010 — Carry Forward scenario (section 41)
-  build({
-    seq: 10,
+    seq: 5,
     type: 'O&A',
     subtype: 'Additional Repair',
     partNumber: '667234',
@@ -426,7 +287,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Additional repair required. Cost: $15,000.',
+        body: 'Additional repair is required. Please review — estimated cost is $15,000.',
         date: '2026-09-02T09:30:00+05:30',
       }),
       msg({
@@ -435,12 +296,13 @@ export const INITIAL_APPROVALS: Approval[] = [
         authorRole: 'Customer',
         body: 'Repair is not approved.',
         date: '2026-09-02T14:00:00+05:30',
+        decision: 'Rejected',
       }),
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'This is an external part and can be carried forward for later action.',
+        body: 'Understood — this is an external part and can be carried forward for later action instead. Would that work?',
         date: '2026-09-02T15:00:00+05:30',
       }),
       msg({
@@ -449,64 +311,25 @@ export const INITIAL_APPROVALS: Approval[] = [
         authorRole: 'Customer',
         body: 'Carry forward approved.',
         date: '2026-09-03T10:00:00+05:30',
+        decision: 'Approved',
       }),
     ],
     outcome: 'Carry Forward',
+    customerDecision: 'Approved',
     closedAt: '2026-09-03T11:00:00+05:30',
     extraAudit: [
       auditEvt('2026-09-03T11:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Carry Forward.'),
     ],
   }),
 
-  // APP-011 — Customer Supplied Another Part scenario (section 42)
+  // APP-006 — closed, Another Part Installed scenario
   build({
-    seq: 11,
-    type: 'Purchase',
-    subtype: 'Customer Provided Part',
-    partNumber: '882910',
-    partDescription: 'Accessory Gearbox',
-    requirement: 'Proposed replacement of accessory gearbox — customer approval requested.',
-    cost: 26500,
-    status: 'Closed',
-    createdAt: '2026-09-01T09:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Proposed replacement accessory gearbox — please review and approve.',
-        date: '2026-09-01T09:30:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'We do not approve this replacement.',
-        date: '2026-09-01T16:00:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'We will provide an alternative part.',
-        date: '2026-09-02T10:00:00+05:30',
-      }),
-    ],
-    outcome: 'Customer Supplied Another Part',
-    closedAt: '2026-09-03T09:00:00+05:30',
-    extraAudit: [
-      auditEvt('2026-09-03T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Customer Supplied Another Part.'),
-    ],
-  }),
-
-  // APP-012 — Another Part Installed scenario (section 43)
-  build({
-    seq: 12,
+    seq: 6,
     type: 'O&A',
     subtype: 'Additional Replace',
     partNumber: '774411',
     partDescription: 'Oil Pressure Sensor',
-    requirement: 'Original proposed sensor replacement not approved — alternative part sourced and proposed.',
+    requirement: 'Original proposed sensor replacement not approved by customer; alternative part sourced and proposed for installation.',
     cost: 4100,
     status: 'Closed',
     createdAt: '2026-08-30T09:00:00+05:30',
@@ -515,131 +338,34 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Original proposed action not approved by customer — alternative part sourced.',
+        body: 'An alternative part has been sourced for this replacement — please confirm you are comfortable proceeding with it.',
         date: '2026-08-30T10:00:00+05:30',
       }),
       msg({
         channel: 'customer',
-        authorName: 'Sarah Mitchell',
+        authorName: 'James Anderson',
         authorRole: 'Customer',
         body: 'Alternative part approved for installation.',
         date: '2026-08-30T15:00:00+05:30',
+        decision: 'Approved',
       }),
     ],
     outcome: 'Another Part Installed',
+    customerDecision: 'Approved',
     closedAt: '2026-08-31T09:00:00+05:30',
     extraAudit: [
-      auditEvt('2026-08-31T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Another Part Installed. Alternative part installed.'),
+      auditEvt('2026-08-31T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Another Part Installed.'),
     ],
   }),
 
-  // APP-013 — Invoice Acknowledgement, closed
+  // APP-007 — open, Additional Repair, customer asked a question
   build({
-    seq: 13,
-    type: 'Invoice Acknowledgement',
-    subtype: null,
-    engineeringItem: 'Invoice INV-88213',
-    requirement: 'Interim invoice issued for completed workscope milestones — customer acknowledgement of payment timing requested.',
-    cost: 214000,
-    status: 'Closed',
-    createdAt: '2026-08-29T09:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Interim invoice issued — please acknowledge payment timing.',
-        date: '2026-08-29T09:30:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'David Chen',
-        authorRole: 'Customer',
-        body: 'Payment timing confirmed as per agreed schedule.',
-        date: '2026-08-29T16:00:00+05:30',
-      }),
-    ],
-    outcome: 'Payment Timing Confirmed',
-    closedAt: '2026-08-30T09:00:00+05:30',
-    extraAudit: [
-      auditEvt('2026-08-30T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Payment Timing Confirmed.'),
-    ],
-  }),
-
-  // APP-014
-  build({
-    seq: 14,
-    type: 'Purchase',
-    subtype: 'Customer Provided Part',
-    partNumber: '667788',
-    partDescription: 'Borescope Plug',
-    requirement: 'Customer-provided borescope plug to be used in lieu of shop stock — confirmation requested.',
-    cost: null,
-    status: 'Open',
-    createdAt: '2026-09-09T14:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Please confirm whether the customer-provided borescope plug will be shipped or is on-site.',
-        date: '2026-09-09T14:20:00+05:30',
-      }),
-    ],
-  }),
-
-  // APP-015
-  build({
-    seq: 15,
-    type: 'Engineering Request',
-    subtype: null,
-    engineeringItem: 'Vibration Troubleshooting',
-    requirement: 'Elevated vibration reading during test cell run requires engineering troubleshooting before release.',
-    cost: null,
-    status: 'Open',
-    createdAt: '2026-09-09T16:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Flagging elevated vibration reading from test cell run for engineering review.',
-        date: '2026-09-09T16:15:00+05:30',
-        attachments: [att('Test Cell Run Report.pdf', 'reports-library', '2026-09-09', { reportType: 'Test' })],
-      }),
-    ],
-  }),
-
-  // APP-016
-  build({
-    seq: 16,
-    type: 'Invoice Acknowledgement',
-    subtype: null,
-    engineeringItem: 'Invoice INV-88250',
-    requirement: 'Final invoice issued for shop visit completion — customer acknowledgement requested.',
-    cost: 1180000,
-    status: 'Open',
-    createdAt: '2026-09-10T08:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Final invoice issued — please review and acknowledge.',
-        date: '2026-09-10T08:15:00+05:30',
-        attachments: [att('Final Invoice INV-88250.pdf', 'external', '2026-09-10', { uploadedBy: 'Harini V' })],
-      }),
-    ],
-  }),
-
-  // APP-017
-  build({
-    seq: 17,
+    seq: 7,
     type: 'O&A',
     subtype: 'Additional Repair',
     partNumber: '334455',
     partDescription: 'Compressor Blade Set',
-    requirement: 'Compressor blade set requires additional repair due to erosion beyond serviceable limits.',
+    requirement: 'Compressor blade set shows erosion beyond serviceable limits and requires additional repair.',
     cost: 9800,
     status: 'Open',
     createdAt: '2026-09-08T13:00:00+05:30',
@@ -648,22 +374,24 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Compressor blade set erosion requires additional repair — please review.',
+        body: 'Please review the erosion findings and confirm whether the additional repair may proceed.',
         date: '2026-09-08T13:20:00+05:30',
       }),
       msg({
         channel: 'customer',
         authorName: 'Priya Patel',
         authorRole: 'Customer',
-        body: 'Can you share the erosion measurement data?',
+        body: 'Can you share the erosion measurement data before we decide?',
         date: '2026-09-08T18:00:00+05:30',
+        decision: 'Clarification Requested',
       }),
     ],
+    customerDecision: 'Clarification Requested',
   }),
 
-  // APP-018
+  // APP-008 — open, Additional Replace, awaiting customer decision
   build({
-    seq: 18,
+    seq: 8,
     type: 'O&A',
     subtype: 'Additional Replace',
     partNumber: '778899',
@@ -677,61 +405,43 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'Bearing wear analysis attached — replacement recommended.',
+        body: 'Bearing wear analysis is attached — replacement is recommended. Please confirm approval.',
         date: '2026-09-07T15:30:00+05:30',
         attachments: [att('Bearing Wear Analysis.pdf', 'reports-library', '2026-09-06', { reportType: 'Engineering' })],
       }),
     ],
   }),
 
-  // APP-019
+  // APP-009 — open, Price Deviation, customer rejected initial ask (still open, CSM to follow up)
   build({
-    seq: 19,
-    type: 'Purchase',
-    subtype: 'LLP Purchase',
-    partNumber: '990011',
-    partDescription: 'LPT Disk',
-    requirement: 'LPT disk has reached cyclic life limit and requires LLP purchase prior to reassembly.',
-    cost: 138500,
+    seq: 9,
+    type: 'O&A',
+    subtype: 'Price Deviation',
+    partNumber: '229981',
+    partDescription: 'LPT Shroud Segment',
+    requirement: 'Repair cost for the LPT shroud segment exceeds the original quote due to additional material required; approval is requested for the price deviation.',
+    cost: 5400,
     status: 'Open',
-    createdAt: '2026-09-03T09:00:00+05:30',
+    createdAt: '2026-09-09T09:00:00+05:30',
     messages: [
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
-        body: 'LPT disk life limit reached — LLP purchase required prior to reassembly.',
-        date: '2026-09-03T09:30:00+05:30',
+        body: 'Please review the attached cost breakdown for the price deviation and confirm approval.',
+        date: '2026-09-09T09:20:00+05:30',
+        attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
       }),
       msg({
         channel: 'customer',
         authorName: 'James Anderson',
         authorRole: 'Customer',
-        body: 'Please share the current market pricing before we approve.',
-        date: '2026-09-04T11:00:00+05:30',
+        body: 'This deviation is not acceptable at this price point.',
+        date: '2026-09-09T14:00:00+05:30',
+        decision: 'Rejected',
       }),
     ],
-  }),
-
-  // APP-020
-  build({
-    seq: 20,
-    type: 'Invoice Acknowledgement',
-    subtype: null,
-    engineeringItem: 'Invoice INV-88301',
-    requirement: 'Progress invoice for teardown and inspection phase — acknowledgement requested.',
-    cost: 340000,
-    status: 'Open',
-    createdAt: '2026-09-06T10:00:00+05:30',
-    messages: [
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Progress invoice for teardown and inspection — please acknowledge.',
-        date: '2026-09-06T10:20:00+05:30',
-      }),
-    ],
+    customerDecision: 'Rejected',
   }),
 ];
 

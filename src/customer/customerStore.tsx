@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useReducer } from 'react';
-import type { Approval, Attachment, ConversationMessage } from '../types';
+import type { Approval, Attachment, ConversationMessage, CustomerDecision } from '../types';
 import { INITIAL_APPROVALS } from '../data/seed';
 
 export const CUSTOMER_PERSONA = { id: 'cust-a', name: 'Brian Whitman', initials: 'BW' };
@@ -30,7 +30,7 @@ interface State {
 }
 
 type Action =
-  | { type: 'ADD_CUSTOMER_RESPONSE'; approvalId: string; body: string; attachments: Attachment[] }
+  | { type: 'ADD_CUSTOMER_DECISION'; approvalId: string; decision: CustomerDecision; comment: string; attachments: Attachment[] }
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
   | { type: 'MARK_ALL_NOTIFICATIONS_READ' }
   | { type: 'ADD_TOAST'; toast: Toast }
@@ -40,9 +40,17 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+const DEFAULT_DECISION_TEXT: Record<CustomerDecision, string> = {
+  Approved: 'Approved.',
+  Rejected: 'Not approved.',
+  'Clarification Requested': 'Please provide more information before we can respond.',
+  'Negotiation Requested': "We'd like to discuss this further before deciding.",
+};
+
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'ADD_CUSTOMER_RESPONSE': {
+    case 'ADD_CUSTOMER_DECISION': {
+      const body = action.comment.trim() || DEFAULT_DECISION_TEXT[action.decision];
       const approvals = state.approvals.map((a) => {
         if (a.id !== action.approvalId) return a;
         const message: ConversationMessage = {
@@ -50,16 +58,24 @@ function reducer(state: State, action: Action): State {
           channel: 'customer',
           authorName: CUSTOMER_PERSONA.name,
           authorRole: 'Customer',
-          body: action.body,
+          body,
           date: nowIso(),
           attachments: action.attachments,
+          decision: action.decision,
         };
         return {
           ...a,
+          customerDecision: action.decision,
           messages: [...a.messages, message],
           audit: [
             ...a.audit,
-            { id: genId('audit'), date: nowIso(), actor: CUSTOMER_PERSONA.name, action: 'Customer responded', detail: action.body },
+            {
+              id: genId('audit'),
+              date: nowIso(),
+              actor: CUSTOMER_PERSONA.name,
+              action: 'Customer responded',
+              detail: `Decision: ${action.decision}. ${body}`,
+            },
           ],
         };
       });
@@ -99,17 +115,17 @@ const initialState: State = {
     },
     {
       id: 'cnotif-2',
-      approvalId: 'APP-016',
+      approvalId: 'APP-003',
       title: 'Approval Requires Your Review',
-      body: 'Approval APP-016 requires your review. Please review and acknowledge the final invoice for the completed shop visit.',
-      date: '2026-09-10T08:20:00+05:30',
+      body: 'Approval APP-003 requires your review. Please review the proposed exchange and confirm approval.',
+      date: '2026-09-06T09:45:00+05:30',
       read: false,
     },
     {
       id: 'cnotif-3',
-      approvalId: 'APP-003',
+      approvalId: 'APP-004',
       title: 'Approval Requires Your Review',
-      body: 'Approval APP-003 requires your review. Please provide the requested BTB package for the LLP purchase.',
+      body: 'Approval APP-004 requires your review. Please confirm the price deviation is acceptable.',
       date: '2026-09-08T09:35:00+05:30',
       read: true,
     },

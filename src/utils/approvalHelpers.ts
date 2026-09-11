@@ -12,14 +12,17 @@ export function latestCustomerResponse(a: Approval): ConversationMessage | null 
   return msgs.reduce((latest, m) => (m.date > latest.date ? m : latest));
 }
 
+// Messages visible to the customer: anything on the 'customer' channel,
+// including internal replies whose forward request was cc'd to the customer.
 export function customerVisibleMessages(a: Approval): ConversationMessage[] {
-  return a.messages
-    .filter((m) => m.channel === 'customer' || m.channel === 'shared-to-customer')
-    .sort((x, y) => (x.date < y.date ? -1 : 1));
+  return a.messages.filter((m) => m.channel === 'customer').sort((x, y) => (x.date < y.date ? -1 : 1));
 }
 
-export function internalMessages(a: Approval): ConversationMessage[] {
-  return a.messages.filter((m) => m.channel === 'internal').sort((x, y) => (x.date < y.date ? -1 : 1));
+// Full merged conversation for the CSM view: customer-visible messages plus
+// internal-only messages, in one chronological feed (internal ones are
+// badged in the UI rather than split into a separate tab).
+export function mergedConversation(a: Approval): ConversationMessage[] {
+  return [...a.messages].sort((x, y) => (x.date < y.date ? -1 : 1));
 }
 
 export function searchableText(a: Approval): string {

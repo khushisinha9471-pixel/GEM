@@ -9,18 +9,20 @@ import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
 import { NotifyCustomerModal } from './components/NotifyCustomerModal';
+import { CloseApprovalModal } from './components/CloseApprovalModal';
 import { searchableText } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 import { ChevronRight } from 'lucide-react';
 
 const AppShell: React.FC = () => {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
   const [search, setSearch] = React.useState('');
   const [filters, setFilters] = React.useState<Filters>(DEFAULT_FILTERS);
   const [statusCard, setStatusCard] = React.useState<ApprovalStatus | 'All'>('All');
   const [createOpen, setCreateOpen] = React.useState(false);
   const [notifyOpen, setNotifyOpen] = React.useState<{ open: boolean; approvalId?: string }>({ open: false });
   const [selectedApprovalId, setSelectedApprovalId] = React.useState<string | null>(null);
+  const [closeApprovalId, setCloseApprovalId] = React.useState<string | null>(null);
 
   const approvals = state.approvals;
   const openCount = approvals.filter((a) => a.status === 'Open').length;
@@ -37,6 +39,7 @@ const AppShell: React.FC = () => {
     .sort((a, b) => b.seq - a.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
+  const closeApproval = approvals.find((a) => a.id === closeApprovalId) ?? null;
 
   return (
     <div className="min-h-screen bg-surface">
@@ -52,7 +55,8 @@ const AppShell: React.FC = () => {
         </div>
 
         <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-          <div>
+          <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
+          <div className="lg:text-right">
             <h1 className="text-[26px] font-bold tracking-tight text-navy">Customer Approvals</h1>
             <p className="mt-1 text-sm text-slate">
               <span className="font-semibold text-navy">Work Order:</span> {WORK_ORDER.id}
@@ -60,7 +64,6 @@ const AppShell: React.FC = () => {
               <span className="font-semibold text-navy">Engine:</span> {WORK_ORDER.engineModel} | ESN {WORK_ORDER.esn}
             </p>
           </div>
-          <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
         </div>
 
         <div className="mb-4">
@@ -79,7 +82,14 @@ const AppShell: React.FC = () => {
           Showing {filtered.length} of {approvals.length} approvals
         </p>
 
-        <ApprovalsTable approvals={filtered} onOpen={(a: Approval) => setSelectedApprovalId(a.id)} />
+        <ApprovalsTable
+          approvals={filtered}
+          role="csm"
+          onOpenConversation={(a: Approval) => setSelectedApprovalId(a.id)}
+          onReopen={(a: Approval) => dispatch({ type: 'REOPEN_APPROVAL', approvalId: a.id })}
+          onRequestClose={(a: Approval) => setCloseApprovalId(a.id)}
+          customerColumnLabel="Customer Comment"
+        />
       </main>
 
       <ToastContainer />
@@ -91,6 +101,7 @@ const AppShell: React.FC = () => {
           approval={selectedApproval}
           onClose={() => setSelectedApprovalId(null)}
           onNotify={(id) => setNotifyOpen({ open: true, approvalId: id })}
+          onRequestClose={(id) => setCloseApprovalId(id)}
         />
       )}
 
@@ -100,6 +111,8 @@ const AppShell: React.FC = () => {
           onClose={() => setNotifyOpen({ open: false })}
         />
       )}
+
+      {closeApproval && <CloseApprovalModal approval={closeApproval} onClose={() => setCloseApprovalId(null)} />}
     </div>
   );
 };

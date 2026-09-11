@@ -6,6 +6,7 @@ import type {
   InternalForwardRequest,
   Attachment,
   FinalOutcome,
+  CustomerDecision,
 } from '../types';
 import { INITIAL_APPROVALS, nextApprovalSeq, CUSTOMERS } from '../data/seed';
 
@@ -29,20 +30,12 @@ interface State {
 type Action =
   | { type: 'CREATE_APPROVAL'; approval: Approval }
   | { type: 'ADD_CSM_MESSAGE'; approvalId: string; body: string; attachments: Attachment[] }
-  | { type: 'SIMULATE_CUSTOMER_REPLY'; approvalId: string; body: string }
+  | { type: 'ADD_CUSTOMER_DECISION'; approvalId: string; decision: CustomerDecision; comment: string; attachments: Attachment[] }
   | { type: 'FORWARD_TO_INTERNAL'; approvalId: string; forwardRequest: InternalForwardRequest }
   | { type: 'SIMULATE_MAILBOX_REPLY'; approvalId: string; forwardRequestId: string; body: string }
-  | {
-      type: 'SHARE_WITH_CUSTOMER';
-      approvalId: string;
-      sourceMessageId: string;
-      context?: string;
-      customerIds: string[] | 'all';
-    }
-  | { type: 'KEEP_INTERNAL'; approvalId: string; messageId: string }
   | { type: 'NOTIFY_CUSTOMER'; approvalId: string; customerIds: string[] | 'all'; message: string }
   | { type: 'UPDATE_ACCESS'; approvalId: string; access: 'all' | 'selected'; selectedCustomerIds: string[] }
-  | { type: 'CLOSE_APPROVAL'; approvalId: string; outcome: FinalOutcome }
+  | { type: 'REQUEST_CLOSE'; approvalId: string; outcome: FinalOutcome }
   | { type: 'REOPEN_APPROVAL'; approvalId: string }
   | { type: 'DELETE_APPROVAL'; approvalId: string }
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
@@ -58,6 +51,13 @@ function nowIso() {
 function updateApproval(state: State, id: string, fn: (a: Approval) => Approval): Approval[] {
   return state.approvals.map((a) => (a.id === id ? fn(a) : a));
 }
+
+const DEFAULT_DECISION_TEXT: Record<CustomerDecision, string> = {
+  Approved: 'Approved.',
+  Rejected: 'Not approved.',
+  'Clarification Requested': 'Please provide more information before we can respond.',
+  'Negotiation Requested': "We'd like to discuss this further before deciding.",
+};
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -81,18 +81,20 @@ function reducer(state: State, action: Action): State {
         ],
         audit: [
           ...a.audit,
-          { id: genId('audit'), date: nowIso(), actor: 'Harini V (CSM)', action: 'CSM response sent', detail: action.body },
+          { id: genId('audit'), date: nowIso(), actor: 'Harini V (CSM)', action: 'GEM response sent', detail: action.body },
         ],
       }));
       return { ...state, approvals };
     }
-    case 'SIMULATE_CUSTOMER_REPLY': {
+    case 'ADD_CUSTOMER_DECISION': {
       let approvalLabel = action.approvalId;
+      const body = action.comment.trim() || DEFAULT_DECISION_TEXT[action.decision];
       const approvals = updateApproval(state, action.approvalId, (a) => {
         approvalLabel = `${a.id} – ${a.subtype ?? a.type}`;
         const customerName = CUSTOMERS.find((c) => a.selectedCustomerIds.includes(c.id))?.name ?? CUSTOMERS[0].name;
         return {
           ...a,
+          customerDecision: action.decision,
           messages: [
             ...a.messages,
             {
@@ -100,14 +102,21 @@ function reducer(state: State, action: Action): State {
               channel: 'customer',
               authorName: a.access === 'selected' ? customerName : 'Customer',
               authorRole: 'Customer',
-              body: action.body,
+              body,
               date: nowIso(),
-              attachments: [],
+              attachments: action.attachments,
+              decision: action.decision,
             } as ConversationMessage,
           ],
           audit: [
             ...a.audit,
-            { id: genId('audit'), date: nowIso(), actor: 'Customer', action: 'Customer responded', detail: action.body },
+            {
+              id: genId('audit'),
+              date: nowIso(),
+              actor: 'Customer',
+              action: 'Customer responded',
+              detail: `Decision: ${action.decision}. ${body}`,
+            },
           ],
         };
       });
@@ -116,7 +125,7 @@ function reducer(state: State, action: Action): State {
         kind: 'customer-response',
         approvalId: action.approvalId,
         title: 'Customer Response Received',
-        body: `${approvalLabel} – Customer has responded to the approval.`,
+        body: `${approvalLabel} – Customer responded: ${action.decision}.`,
         date: nowIso(),
         read: false,
       };
@@ -138,7 +147,9 @@ function reducer(state: State, action: Action): State {
             date: nowIso(),
             actor: 'Harini V (CSM)',
             action: 'Forwarded to internal member',
-            detail: `Sent to ${action.forwardRequest.recipientName} (${action.forwardRequest.recipientRole}) via ${action.forwardRequest.sentVia} — ${action.forwardRequest.requestType}.`,
+            detail: `Sent to ${action.forwardRequest.recipientName} (${action.forwardRequest.recipientRole}) via ${action.forwardRequest.sentVia} — ${action.forwardRequest.requestType}.${
+              action.forwardRequest.ccCustomer ? ' Customer cc\'d.' : ''
+            }`,
           },
         ],
       }));
@@ -173,7 +184,7 @@ function reducer(state: State, action: Action): State {
             ...a.messages,
             {
               id: newMsgId,
-              channel: 'internal',
+              channel: fwd?.ccCustomer ? 'customer' : 'internal',
               authorName: fwd?.recipientName ?? 'Internal Member',
               authorRole: 'Internal',
               authorTitle: fwd?.recipientRole,
@@ -190,7 +201,9 @@ function reducer(state: State, action: Action): State {
               date: nowIso(),
               actor: fwd?.recipientName ?? 'Internal Member',
               action: 'Internal email response captured',
-              detail: `Captured automatically from email reply via ${fwd?.sentVia ?? 'email'}.`,
+              detail: `Captured automatically from email reply via ${fwd?.sentVia ?? 'email'}.${
+                fwd?.ccCustomer ? ' Visible to customer (cc\'d on thread).' : ' Internal only.'
+              }`,
             },
           ],
         };
@@ -213,61 +226,6 @@ function reducer(state: State, action: Action): State {
           { id: genId('toast'), title: 'Internal response captured from email', body: `${responderName} replied on ${action.approvalId}`, tone: 'success' },
         ],
       };
-    }
-    case 'SHARE_WITH_CUSTOMER': {
-      const approvals = updateApproval(state, action.approvalId, (a) => {
-        const source = a.messages.find((m) => m.id === action.sourceMessageId);
-        if (!source) return a;
-        const sharedMsg: ConversationMessage = {
-          id: genId('msg'),
-          channel: 'shared-to-customer',
-          authorName: source.authorName,
-          authorRole: source.authorRole,
-          authorTitle: source.authorTitle,
-          body: source.body,
-          date: nowIso(),
-          attachments: source.attachments,
-          sharedFromMessageId: source.id,
-          sharedByCsmName: 'Harini V',
-          sharedContext: action.context,
-        };
-        return {
-          ...a,
-          messages: a.messages
-            .map((m): ConversationMessage => (m.id === source.id ? { ...m, internalDecision: 'shared' as const } : m))
-            .concat(sharedMsg),
-          audit: [
-            ...a.audit,
-            {
-              id: genId('audit'),
-              date: nowIso(),
-              actor: 'Harini V (CSM)',
-              action: 'Shared internal response with customer',
-              detail: `Response from ${source.authorName} shared with ${
-                action.customerIds === 'all' ? 'all mapped customers' : `${action.customerIds.length} selected customer(s)`
-              }.`,
-            },
-          ],
-        };
-      });
-      return {
-        ...state,
-        approvals,
-        toasts: [...state.toasts, { id: genId('toast'), title: 'Response shared with customer', tone: 'success' }],
-      };
-    }
-    case 'KEEP_INTERNAL': {
-      const approvals = updateApproval(state, action.approvalId, (a) => ({
-        ...a,
-        messages: a.messages.map(
-          (m): ConversationMessage => (m.id === action.messageId ? { ...m, internalDecision: 'kept-internal' as const } : m)
-        ),
-        audit: [
-          ...a.audit,
-          { id: genId('audit'), date: nowIso(), actor: 'Harini V (CSM)', action: 'Internal response kept internal', detail: undefined },
-        ],
-      }));
-      return { ...state, approvals };
     }
     case 'NOTIFY_CUSTOMER': {
       const approvals = updateApproval(state, action.approvalId, (a) => ({
@@ -307,7 +265,7 @@ function reducer(state: State, action: Action): State {
       }));
       return { ...state, approvals, toasts: [...state.toasts, { id: genId('toast'), title: 'Approval access updated', tone: 'success' }] };
     }
-    case 'CLOSE_APPROVAL': {
+    case 'REQUEST_CLOSE': {
       const approvals = updateApproval(state, action.approvalId, (a) => ({
         ...a,
         status: 'Closed',
@@ -377,7 +335,7 @@ const initialState: State = {
       kind: 'customer-response',
       approvalId: 'APP-001',
       title: 'Customer Response Received',
-      body: 'APP-001 – Additional Repair – HPT Blade. Customer has responded to the approval.',
+      body: 'APP-001 – Additional Repair – HPT Blade. Customer responded: Clarification Requested.',
       date: '2026-09-10T14:20:00+05:30',
       read: true,
     },

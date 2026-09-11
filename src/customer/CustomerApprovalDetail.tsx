@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Send } from 'lucide-react';
-import type { Approval, Attachment } from '../types';
+import type { Approval, Attachment, CustomerDecision } from '../types';
+import { CUSTOMER_DECISIONS } from '../types';
 import { StatusPill, OutcomeBadge } from '../components/StatusPill';
 import { formatCost, itemPartLabel } from '../utils/format';
 import { customerVisibleMessages } from '../utils/approvalHelpers';
@@ -11,17 +12,26 @@ import { CustomerAttachmentPicker } from './CustomerAttachmentPicker';
 
 type Tab = 'conversation' | 'attachments';
 
+const DECISION_BUTTON_STYLES: Record<CustomerDecision, string> = {
+  Approved: 'border-emerald-300 bg-emerald-50 text-emerald-700',
+  Rejected: 'border-red-300 bg-red-50 text-red-700',
+  'Clarification Requested': 'border-amber-300 bg-amber-50 text-amber-700',
+  'Negotiation Requested': 'border-amber-300 bg-amber-50 text-amber-700',
+};
+
 export const CustomerApprovalDetail: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
   const { dispatch } = useCustomerStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
+  const [decision, setDecision] = React.useState<CustomerDecision | null>(null);
   const [replyBody, setReplyBody] = React.useState('');
   const [replyAttachments, setReplyAttachments] = React.useState<Attachment[]>([]);
 
   const visibleMessages = customerVisibleMessages(approval);
 
   function sendReply() {
-    if (!replyBody.trim()) return;
-    dispatch({ type: 'ADD_CUSTOMER_RESPONSE', approvalId: approval.id, body: replyBody.trim(), attachments: replyAttachments });
+    if (!decision) return;
+    dispatch({ type: 'ADD_CUSTOMER_DECISION', approvalId: approval.id, decision, comment: replyBody.trim(), attachments: replyAttachments });
+    setDecision(null);
     setReplyBody('');
     setReplyAttachments([]);
   }
@@ -83,18 +93,34 @@ export const CustomerApprovalDetail: React.FC<{ approval: Approval; onClose: () 
 
               <div className="rounded-xl border border-line p-4">
                 <label className="field-label">Your Response</label>
+                <div className="flex flex-wrap gap-2">
+                  {CUSTOMER_DECISIONS.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setDecision(d)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        decision === d ? DECISION_BUTTON_STYLES[d] : 'border-line text-slate hover:bg-surface'
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+
+                <label className="field-label mt-3">Comment (optional)</label>
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   rows={3}
-                  placeholder="Type your response to the GEM team..."
+                  placeholder="Add any additional comment..."
                   className="textarea-input"
                 />
                 <div className="mt-2">
                   <CustomerAttachmentPicker attachments={replyAttachments} onChange={setReplyAttachments} />
                 </div>
                 <div className="mt-3 flex justify-end">
-                  <button onClick={sendReply} disabled={!replyBody.trim()} className="btn-primary">
+                  <button onClick={sendReply} disabled={!decision} className="btn-primary">
                     <Send size={14} />
                     Send Response
                   </button>

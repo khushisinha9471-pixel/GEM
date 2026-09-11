@@ -10,7 +10,7 @@ export const CloseApprovalModal: React.FC<{ approval: Approval; onClose: () => v
 
   function submit() {
     if (!outcome) return;
-    dispatch({ type: 'CLOSE_APPROVAL', approvalId: approval.id, outcome });
+    dispatch({ type: 'REQUEST_CLOSE', approvalId: approval.id, outcome });
     onClose();
   }
 

@@ -7,12 +7,14 @@ import { ConversationThread } from './ConversationThread';
 import { useStore, genForwardId } from '../state/store';
 import { itemPartLabel } from '../utils/format';
 import { customerVisibleMessages } from '../utils/approvalHelpers';
+import { CUSTOMERS } from '../data/seed';
 
 export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
   const { state, dispatch } = useStore();
   const [recipientId, setRecipientId] = React.useState('');
   const [requestType, setRequestType] = React.useState(REQUEST_TYPES[0]);
-  const [question, setQuestion] = React.useState('');
+  const [question, setQuestion] = React.useState(approval.requirement);
+  const [ccCustomer, setCcCustomer] = React.useState(true);
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
   const [provider, setProvider] = React.useState<'Gmail' | 'Outlook'>(state.emailConnection.provider ?? 'Gmail');
   const [query, setQuery] = React.useState('');
@@ -49,10 +51,18 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         status: 'awaiting',
         includeHistory,
         includedMessages: includeHistory ? conversationHistory : [],
+        ccCustomer,
       },
     });
     onClose();
   }
+
+  const ccNames =
+    approval.access === 'all'
+      ? 'all mapped customers'
+      : CUSTOMERS.filter((c) => approval.selectedCustomerIds.includes(c.id))
+          .map((c) => c.name)
+          .join(', ') || 'mapped customers';
 
   return (
     <div className="modal-overlay-center">
@@ -111,7 +121,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
           </div>
 
           <div>
-            <label className="field-label">CSM Question / Request *</label>
+            <label className="field-label">Message to Internal Member *</label>
             <textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -119,7 +129,24 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
               placeholder="Customer has requested an engineer's recommendation. Please advise whether we should proceed with the repair or replace the part."
               className="textarea-input"
             />
+            <p className="mt-1 text-xs text-slate">Pre-filled with the requirement — edit freely before sending.</p>
           </div>
+
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-line p-3">
+            <input
+              type="checkbox"
+              checked={ccCustomer}
+              onChange={(e) => setCcCustomer(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-[#0B2345]"
+            />
+            <span className="flex-1">
+              <span className="text-sm font-semibold text-navy">CC Customer</span>
+              <span className="mt-0.5 block text-xs text-slate">
+                Include {ccNames} on this email. The internal member's reply — and this thread — will appear directly
+                in the customer conversation, recorded automatically on the portal.
+              </span>
+            </span>
+          </label>
 
           <AttachmentManager attachments={attachments} onChange={setAttachments} />
 
@@ -169,6 +196,11 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
               <p>
                 <span className="font-medium text-slate">To:</span> {effectiveRecipientEmail ?? '—'}
               </p>
+              {ccCustomer && (
+                <p>
+                  <span className="font-medium text-slate">CC:</span> {ccNames}
+                </p>
+              )}
               <p>
                 <span className="font-medium text-slate">Subject:</span> {subjectLine}
               </p>
