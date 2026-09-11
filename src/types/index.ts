@@ -28,9 +28,6 @@ export const SUBTYPES_BY_TYPE: Record<ApprovalType, string[]> = {
 };
 
 export const FINAL_OUTCOMES: FinalOutcome[] = [
-  'Approved',
-  'Approved with Conditions',
-  'Rejected',
   'Carry Forward',
   'Customer Supplied Another Part',
   'Another Part Installed',
