@@ -6,7 +6,17 @@ import { formatCost, itemPartLabel } from '../utils/format';
 import { latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
 import { FileQuestion } from 'lucide-react';
 
-export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Approval) => void }> = ({ approvals, onOpen }) => {
+export const ApprovalsTable: React.FC<{
+  approvals: Approval[];
+  onOpen: (a: Approval) => void;
+  customerColumnLabel?: string;
+  customerEmptyLabel?: string;
+}> = ({
+  approvals,
+  onOpen,
+  customerColumnLabel = 'Customer Response',
+  customerEmptyLabel = 'Awaiting customer response',
+}) => {
   if (approvals.length === 0) {
     return (
       <div className="card flex flex-col items-center justify-center gap-2 py-20 text-center">
@@ -40,7 +50,7 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
             <th className="px-3 py-3">Requirement</th>
             <th className="px-3 py-3 text-right">Cost</th>
             <th className="px-3 py-3">CSM Response</th>
-            <th className="px-3 py-3">Customer Response</th>
+            <th className="px-3 py-3">{customerColumnLabel}</th>
             <th className="px-3 py-3">Status</th>
           </tr>
         </thead>
@@ -64,7 +74,7 @@ export const ApprovalsTable: React.FC<{ approvals: Approval[]; onOpen: (a: Appro
                 <ResponseCell message={latestCsmResponse(a)} emptyLabel="No CSM response yet" />
               </td>
               <td className="px-3 py-3 align-top">
-                <ResponseCell message={latestCustomerResponse(a)} emptyLabel="Awaiting customer response" />
+                <ResponseCell message={latestCustomerResponse(a)} emptyLabel={customerEmptyLabel} />
               </td>
               <td className="px-3 py-3 align-top">
                 <StatusPill status={a.status} />

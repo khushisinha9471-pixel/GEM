@@ -66,7 +66,12 @@ const CustomerAppShell: React.FC = () => {
           Showing {filtered.length} of {approvals.length} approvals
         </p>
 
-        <ApprovalsTable approvals={filtered} onOpen={(a: Approval) => setSelectedApprovalId(a.id)} />
+        <ApprovalsTable
+          approvals={filtered}
+          onOpen={(a: Approval) => setSelectedApprovalId(a.id)}
+          customerColumnLabel="Your Response"
+          customerEmptyLabel="Awaiting your response"
+        />
       </main>
 
       <CustomerToastContainer />
