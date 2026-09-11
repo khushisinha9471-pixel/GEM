@@ -9,7 +9,6 @@ import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
 import { NotifyCustomerModal } from './components/NotifyCustomerModal';
-import { CloseApprovalModal } from './components/CloseApprovalModal';
 import { searchableText, serialNumberOf } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 
@@ -21,7 +20,6 @@ const AppShell: React.FC = () => {
   const [createOpen, setCreateOpen] = React.useState(false);
   const [notifyOpen, setNotifyOpen] = React.useState<{ open: boolean; approvalId?: string }>({ open: false });
   const [selectedApprovalId, setSelectedApprovalId] = React.useState<string | null>(null);
-  const [closeApprovalId, setCloseApprovalId] = React.useState<string | null>(null);
 
   const approvals = state.approvals;
   const openCount = approvals.filter((a) => a.status === 'Open').length;
@@ -38,9 +36,7 @@ const AppShell: React.FC = () => {
     .sort((a, b) => b.seq - a.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
-  const closeApproval = approvals.find((a) => a.id === closeApprovalId) ?? null;
   const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
-  const closeSerial = serialNumberOf(approvals, filtered, closeApprovalId);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -80,7 +76,7 @@ const AppShell: React.FC = () => {
           role="csm"
           onOpenConversation={(a: Approval) => setSelectedApprovalId(a.id)}
           onReopen={(a: Approval) => dispatch({ type: 'REOPEN_APPROVAL', approvalId: a.id })}
-          onRequestClose={(a: Approval) => setCloseApprovalId(a.id)}
+          onRequestClose={(a: Approval) => dispatch({ type: 'REQUEST_CLOSE', approvalId: a.id })}
           customerColumnLabel="Customer Comment"
         />
       </main>
@@ -95,7 +91,7 @@ const AppShell: React.FC = () => {
           serial={selectedSerial ?? 0}
           onClose={() => setSelectedApprovalId(null)}
           onNotify={(id) => setNotifyOpen({ open: true, approvalId: id })}
-          onRequestClose={(id) => setCloseApprovalId(id)}
+          onRequestClose={(id) => dispatch({ type: 'REQUEST_CLOSE', approvalId: id })}
         />
       )}
 
@@ -104,10 +100,6 @@ const AppShell: React.FC = () => {
           initialApprovalId={notifyOpen.approvalId}
           onClose={() => setNotifyOpen({ open: false })}
         />
-      )}
-
-      {closeApproval && (
-        <CloseApprovalModal approval={closeApproval} serial={closeSerial ?? 0} onClose={() => setCloseApprovalId(null)} />
       )}
     </div>
   );

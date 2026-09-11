@@ -35,7 +35,7 @@ type Action =
   | { type: 'SIMULATE_MAILBOX_REPLY'; approvalId: string; forwardRequestId: string; body: string }
   | { type: 'NOTIFY_CUSTOMER'; approvalId: string; customerIds: string[] | 'all'; message: string }
   | { type: 'UPDATE_ACCESS'; approvalId: string; access: 'all' | 'selected'; selectedCustomerIds: string[] }
-  | { type: 'REQUEST_CLOSE'; approvalId: string; outcome: FinalOutcome }
+  | { type: 'REQUEST_CLOSE'; approvalId: string; outcome?: FinalOutcome }
   | { type: 'REOPEN_APPROVAL'; approvalId: string }
   | { type: 'DELETE_APPROVAL'; approvalId: string }
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
@@ -262,14 +262,20 @@ function reducer(state: State, action: Action): State {
       const approvals = updateApproval(state, action.approvalId, (a) => ({
         ...a,
         status: 'Closed',
-        outcome: action.outcome,
+        outcome: action.outcome ?? a.outcome,
         closedAt: nowIso(),
         audit: [
           ...a.audit,
-          { id: genId('audit'), date: nowIso(), actor: 'Harini V (CSM)', action: 'Status changed to Closed', detail: `Final Outcome recorded: ${action.outcome}.` },
+          {
+            id: genId('audit'),
+            date: nowIso(),
+            actor: 'Harini V (CSM)',
+            action: 'Status changed to Closed',
+            detail: action.outcome ? `Final Outcome recorded: ${action.outcome}.` : 'Approval closed.',
+          },
         ],
       }));
-      return { ...state, approvals, toasts: [...state.toasts, { id: genId('toast'), title: 'Approval closed', body: action.outcome, tone: 'success' }] };
+      return { ...state, approvals, toasts: [...state.toasts, { id: genId('toast'), title: 'Approval closed', tone: 'success' }] };
     }
     case 'REOPEN_APPROVAL': {
       const approvals = updateApproval(state, action.approvalId, (a) => ({
