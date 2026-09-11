@@ -19,6 +19,11 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: target ? `dist-${target}` : 'dist',
+    // Inline image assets (e.g. the logo) as base64 so each production
+    // build stays a single self-contained JS/CSS pair with no separate
+    // asset files — required so the whole page can be inlined into one
+    // standalone HTML artifact.
+    assetsInlineLimit: 200 * 1024,
     rollupOptions: {
       input:
         singleEntryInput ?? {
