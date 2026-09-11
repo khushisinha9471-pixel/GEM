@@ -20,6 +20,17 @@ const DECISION_BUTTON_STYLES: Record<CustomerDecision, string> = {
   'Negotiation Requested': 'border-amber-300 bg-amber-50 text-amber-700',
 };
 
+// The customer picks a decision by the action they're taking ("Request
+// Clarification"); the CSM side still shows the resulting state
+// ("Clarification Requested") everywhere else — table, conversation badges.
+const CUSTOMER_DECISION_LABELS: Record<CustomerDecision, string> = {
+  Approved: 'Approved',
+  'Approve with Condition': 'Approve with Condition',
+  Rejected: 'Rejected',
+  'Clarification Requested': 'Request Clarification',
+  'Negotiation Requested': 'Request Negotiation',
+};
+
 export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: number; onClose: () => void }> = ({
   approval,
   serial,
@@ -108,7 +119,7 @@ export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: numb
                         decision === d ? DECISION_BUTTON_STYLES[d] : 'border-line text-slate hover:bg-surface'
                       }`}
                     >
-                      {d}
+                      {CUSTOMER_DECISION_LABELS[d]}
                     </button>
                   ))}
                 </div>
