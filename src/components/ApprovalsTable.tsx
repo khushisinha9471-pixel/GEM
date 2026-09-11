@@ -173,7 +173,7 @@ export const ApprovalsTable: React.FC<{
                   ) : a.customerDecision ? (
                     <span className="text-sm italic text-slate/60">No comment</span>
                   ) : (
-                    <span className="text-sm italic text-slate/60">Awaiting Customer response</span>
+                    <span className="text-sm italic text-slate/60">Awaiting customer comment</span>
                   )}
                 </td>
 
