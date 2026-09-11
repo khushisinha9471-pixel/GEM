@@ -54,7 +54,7 @@ function updateApproval(state: State, id: string, fn: (a: Approval) => Approval)
 
 const DEFAULT_DECISION_TEXT: Record<CustomerDecision, string> = {
   Approved: 'Approved.',
-  'Approve with Condition': 'Approved, subject to the condition noted.',
+  'Approved with Condition': 'Approved, subject to the condition noted.',
   Rejected: 'Not approved.',
   'Clarification Requested': 'Please provide more information before we can respond.',
   'Negotiation Requested': "We'd like to discuss this further before deciding.",

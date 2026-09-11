@@ -3,11 +3,11 @@ import type { Approval, CustomerDecision } from '../types';
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDateTime } from '../utils/format';
 import { latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
-import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail } from 'lucide-react';
+import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Approve with Condition': 'bg-sky-50 text-sky-700 border-sky-200',
+  'Approved with Condition': 'bg-sky-50 text-sky-700 border-sky-200',
   Rejected: 'bg-red-50 text-red-700 border-red-200',
   'Clarification Requested': 'bg-amber-50 text-amber-700 border-amber-200',
   'Negotiation Requested': 'bg-amber-50 text-amber-700 border-amber-200',
@@ -164,7 +164,7 @@ export const ApprovalsTable: React.FC<{
                   }`}
                 >
                   {customerMsg ? (
-                    <MessagePreview message={customerMsg} />
+                    <MessagePreview message={customerMsg} openable={customerColClickable} />
                   ) : customerColClickable ? (
                     <span className="text-sm font-medium text-amber-700">Click to add comment</span>
                   ) : (
@@ -179,7 +179,7 @@ export const ApprovalsTable: React.FC<{
                   }`}
                 >
                   {gemMsg ? (
-                    <MessagePreview message={gemMsg} />
+                    <MessagePreview message={gemMsg} openable={gemClickable} />
                   ) : gemClickable ? (
                     <span className="text-sm font-medium text-amber-700">Click to add comment</span>
                   ) : (
@@ -254,7 +254,10 @@ const ExpandableText: React.FC<{ text: string; className?: string }> = ({ text, 
   );
 };
 
-const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCsmResponse>> }> = ({ message }) => (
+const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCsmResponse>>; openable?: boolean }> = ({
+  message,
+  openable,
+}) => (
   <div className="min-w-0">
     <ExpandableText text={message.body} className="text-sm leading-snug text-navy" />
     <div className="mt-1 flex items-center gap-2 text-[11px] text-slate">
@@ -268,6 +271,12 @@ const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCs
         <span className="inline-flex items-center gap-0.5 text-slate">
           <Paperclip size={11} />
           {message.attachments.length}
+        </span>
+      )}
+      {openable && (
+        <span className="ml-auto inline-flex items-center gap-1 text-navy/50" title="Click to view conversation and reply">
+          <MessageSquare size={11} />
+          <span className="font-medium">Reply</span>
         </span>
       )}
     </div>
