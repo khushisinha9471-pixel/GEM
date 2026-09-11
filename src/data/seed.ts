@@ -271,7 +271,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     ],
   }),
 
-  // APP-005 — closed, Carry Forward scenario
+  // APP-005 — open, Additional Repair, customer rejected (CSM still to follow up)
   build({
     seq: 5,
     type: 'O&A',
@@ -280,7 +280,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     partDescription: 'External Wiring Harness',
     requirement: 'Additional repair required to the external wiring harness identified during inspection.',
     cost: 15000,
-    status: 'Closed',
+    status: 'Open',
     createdAt: '2026-09-02T09:00:00+05:30',
     messages: [
       msg({
@@ -294,32 +294,13 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'Priya Patel',
         authorRole: 'Customer',
-        body: 'Repair is not approved.',
+        body: 'Repair is not approved at this cost.',
         date: '2026-09-02T14:00:00+05:30',
         decision: 'Rejected',
       }),
-      msg({
-        channel: 'customer',
-        authorName: 'Harini V',
-        authorRole: 'CSM',
-        body: 'Understood — this is an external part and can be carried forward for later action instead. Would that work?',
-        date: '2026-09-02T15:00:00+05:30',
-      }),
-      msg({
-        channel: 'customer',
-        authorName: 'Priya Patel',
-        authorRole: 'Customer',
-        body: 'Carry forward approved.',
-        date: '2026-09-03T10:00:00+05:30',
-        decision: 'Approved',
-      }),
     ],
-    outcome: 'Carry Forward',
-    customerDecision: 'Approved',
-    closedAt: '2026-09-03T11:00:00+05:30',
-    extraAudit: [
-      auditEvt('2026-09-03T11:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Carry Forward.'),
-    ],
+    customerDecision: 'Rejected',
+    extraAudit: [auditEvt('2026-09-02T14:00:00+05:30', 'Priya Patel', 'Customer responded', 'Rejected.')],
   }),
 
   // APP-006 — closed, Another Part Installed scenario
@@ -389,7 +370,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     customerDecision: 'Clarification Requested',
   }),
 
-  // APP-008 — open, Additional Replace, awaiting customer decision
+  // APP-008 — open, Additional Replace, customer approved (CSM still to close out)
   build({
     seq: 8,
     type: 'O&A',
@@ -409,10 +390,20 @@ export const INITIAL_APPROVALS: Approval[] = [
         date: '2026-09-07T15:30:00+05:30',
         attachments: [att('Bearing Wear Analysis.pdf', 'reports-library', '2026-09-06', { reportType: 'Engineering' })],
       }),
+      msg({
+        channel: 'customer',
+        authorName: 'David Chen',
+        authorRole: 'Customer',
+        body: 'Approved — please proceed with the replacement.',
+        date: '2026-09-07T19:10:00+05:30',
+        decision: 'Approved',
+      }),
     ],
+    customerDecision: 'Approved',
+    extraAudit: [auditEvt('2026-09-07T19:10:00+05:30', 'David Chen', 'Customer responded', 'Approved.')],
   }),
 
-  // APP-009 — open, Price Deviation, customer rejected initial ask (still open, CSM to follow up)
+  // APP-009 — open, Price Deviation, awaiting customer decision
   build({
     seq: 9,
     type: 'O&A',
@@ -432,16 +423,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         date: '2026-09-09T09:20:00+05:30',
         attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
       }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'This deviation is not acceptable at this price point.',
-        date: '2026-09-09T14:00:00+05:30',
-        decision: 'Rejected',
-      }),
     ],
-    customerDecision: 'Rejected',
   }),
 ];
 
