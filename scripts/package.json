@@ -1,0 +1,14 @@
+{
+  "name": "gem-email-capture-test",
+  "private": true,
+  "type": "module",
+  "description": "Standalone real-world test of the Forward to Internal Member email capture flow. Run on your own machine, not in a sandboxed environment.",
+  "scripts": {
+    "test": "node test-email-capture.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.0",
+    "imapflow": "^1.0.0",
+    "mailparser": "^3.6.0"
+  }
+}
