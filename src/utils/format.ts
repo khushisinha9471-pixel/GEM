@@ -17,11 +17,6 @@ export function formatCost(cost: number | null | undefined): string {
   return `$${cost.toLocaleString('en-US')}`;
 }
 
-export function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  return text.slice(0, max - 1).trimEnd() + '…';
-}
-
 export function itemPartLabel(a: { partNumber?: string; partDescription?: string; engineeringItem?: string }): string {
   if (a.partNumber && a.partDescription) return `PN ${a.partNumber} — ${a.partDescription}`;
   if (a.partDescription) return a.partDescription;

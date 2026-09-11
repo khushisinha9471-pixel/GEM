@@ -219,7 +219,7 @@ export const ApprovalDetailPanel: React.FC<{
               ))}
 
               <div className="rounded-xl border border-line p-4">
-                <label className="field-label">GEM Response</label>
+                <label className="field-label">GEM Comment</label>
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}

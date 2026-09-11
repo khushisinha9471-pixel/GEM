@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Approval, CustomerDecision } from '../types';
 import { StatusPill } from './StatusPill';
-import { formatCost, formatDateTime, truncate } from '../utils/format';
+import { formatCost, formatDateTime } from '../utils/format';
 import { latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
-import { ChevronDown, ChevronUp, FileQuestion, Paperclip, Mail } from 'lucide-react';
+import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -20,7 +20,6 @@ export const ApprovalsTable: React.FC<{
   onRequestClose?: (approval: Approval) => void;
   customerColumnLabel?: string;
 }> = ({ approvals, role, onOpenConversation, onReopen, onRequestClose, customerColumnLabel = 'Customer Comment' }) => {
-  const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
   const [statusOpenId, setStatusOpenId] = React.useState<string | null>(null);
   const statusRef = React.useRef<HTMLDivElement>(null);
 
@@ -31,15 +30,6 @@ export const ApprovalsTable: React.FC<{
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  function toggleExpanded(id: string) {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   if (approvals.length === 0) {
     return (
@@ -62,8 +52,8 @@ export const ApprovalsTable: React.FC<{
           <col className="w-[124px]" />
           <col className="w-[280px]" />
           <col className="w-[74px]" />
-          <col className="w-[210px]" />
           <col className="w-[116px]" />
+          <col className="w-[210px]" />
           <col className="w-[210px]" />
         </colgroup>
         <thead>
@@ -75,14 +65,13 @@ export const ApprovalsTable: React.FC<{
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
             <th className="px-3 py-3 text-right">Cost</th>
-            <th className="px-3 py-3">GEM Response</th>
             <th className="px-3 py-3">Approval Requested</th>
             <th className="px-3 py-3">{customerColumnLabel}</th>
+            <th className="px-3 py-3">GEM Comment</th>
           </tr>
         </thead>
         <tbody>
           {approvals.map((a, idx) => {
-            const isExpanded = expanded.has(a.id);
             const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
@@ -144,38 +133,11 @@ export const ApprovalsTable: React.FC<{
                     : a.partDescription ?? a.engineeringItem ?? '—'}
                 </td>
 
-                <td
-                  onClick={() => toggleExpanded(a.id)}
-                  className="cursor-pointer px-3 py-3 align-top text-sm text-slate hover:bg-navy-50/30"
-                  title={isExpanded ? 'Click to collapse' : 'Click to expand'}
-                >
-                  <div className="flex items-start gap-1.5">
-                    <p className={isExpanded ? '' : 'line-clamp-2'}>{a.requirement}</p>
-                    {a.requirement.length > 110 &&
-                      (isExpanded ? (
-                        <ChevronUp size={13} className="mt-0.5 flex-none text-slate/60" />
-                      ) : (
-                        <ChevronDown size={13} className="mt-0.5 flex-none text-slate/60" />
-                      ))}
-                  </div>
+                <td className="px-3 py-3 align-top text-sm text-slate">
+                  <ExpandableText text={a.requirement} className="text-sm text-slate" threshold={110} />
                 </td>
 
                 <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
-
-                <td
-                  onClick={gemClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${gemClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
-                    gemClickable && !gemMsg ? 'bg-amber-50/60' : ''
-                  }`}
-                >
-                  {gemMsg ? (
-                    <MessagePreview message={gemMsg} />
-                  ) : gemClickable ? (
-                    <span className="text-sm font-medium text-amber-700">Click to add comment</span>
-                  ) : (
-                    <span className="text-sm italic text-slate/60">No response yet</span>
-                  )}
-                </td>
 
                 <td
                   onClick={approvalReqClickable ? () => onOpenConversation(a) : undefined}
@@ -210,6 +172,21 @@ export const ApprovalsTable: React.FC<{
                     <span className="text-sm italic text-slate/60">Awaiting customer response</span>
                   )}
                 </td>
+
+                <td
+                  onClick={gemClickable ? () => onOpenConversation(a) : undefined}
+                  className={`px-3 py-3 align-top ${gemClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
+                    gemClickable && !gemMsg ? 'bg-amber-50/60' : ''
+                  }`}
+                >
+                  {gemMsg ? (
+                    <MessagePreview message={gemMsg} />
+                  ) : gemClickable ? (
+                    <span className="text-sm font-medium text-amber-700">Click to add comment</span>
+                  ) : (
+                    <span className="text-sm italic text-slate/60">No response yet</span>
+                  )}
+                </td>
               </tr>
             );
           })}
@@ -219,11 +196,57 @@ export const ApprovalsTable: React.FC<{
   );
 };
 
+const ExpandableText: React.FC<{ text: string; className?: string; threshold?: number }> = ({
+  text,
+  className = 'text-sm text-slate',
+  threshold = 110,
+}) => {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+  const overflowing = text.length > threshold;
+
+  React.useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className={`relative ${overflowing ? 'pr-4' : ''}`}>
+      <p className={`line-clamp-2 ${className}`}>{text}</p>
+      {overflowing && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((v) => !v);
+            }}
+            title="Click to view full text"
+            className="absolute -top-0.5 right-0 rounded p-0.5 text-slate/40 transition hover:bg-white hover:text-navy"
+          >
+            <Maximize2 size={11} />
+          </button>
+          {open && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-0 top-5 z-40 w-72 max-w-[80vw] rounded-lg border border-line bg-white p-3 text-sm leading-snug text-navy shadow-pop"
+            >
+              {text}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
 const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCsmResponse>> }> = ({ message }) => (
   <div className="min-w-0">
-    <p className="line-clamp-2 text-sm leading-snug text-navy" title={message.body}>
-      {truncate(message.body, 140)}
-    </p>
+    <ExpandableText text={message.body} className="text-sm leading-snug text-navy" threshold={140} />
     <div className="mt-1 flex items-center gap-2 text-[11px] text-slate">
       <span className="font-medium">{formatDateTime(message.date)}</span>
       {message.capturedFromEmail && (

@@ -9,7 +9,6 @@ import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
 import { searchableText } from '../utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from '../types';
-import { ChevronRight } from 'lucide-react';
 
 const CustomerAppShell: React.FC = () => {
   const { state } = useCustomerStore();
@@ -38,17 +37,9 @@ const CustomerAppShell: React.FC = () => {
       <CustomerHeader onOpenApproval={setSelectedApprovalId} />
 
       <main className="mx-auto max-w-[1440px] px-6 py-6">
-        <div className="mb-5 flex flex-wrap items-center gap-2 text-sm text-slate">
-          <span className="font-medium text-navy">Work Orders</span>
-          <ChevronRight size={14} />
-          <span className="font-medium text-navy">{WORK_ORDER.id}</span>
-          <ChevronRight size={14} />
-          <span>Approvals</span>
-        </div>
-
-        <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:gap-8">
           <SummaryCards openCount={openCount} closedCount={closedCount} activeFilter={statusCard} onSelect={setStatusCard} />
-          <div className="lg:text-right">
+          <div>
             <h1 className="text-[26px] font-bold tracking-tight text-navy">Approvals</h1>
             <p className="mt-1 text-sm text-slate">
               <span className="font-semibold text-navy">Work Order:</span> {WORK_ORDER.id}

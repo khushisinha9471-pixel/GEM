@@ -197,7 +197,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
           </div>
 
           <div>
-            <label className="field-label">CSM Response</label>
+            <label className="field-label">GEM Comment</label>
             <textarea
               value={csmResponse}
               onChange={(e) => setCsmResponse(e.target.value)}
