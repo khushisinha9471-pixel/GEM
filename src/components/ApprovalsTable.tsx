@@ -9,7 +9,7 @@ const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   'Approved with Condition': 'bg-sky-50 text-sky-700 border-sky-200',
   Rejected: 'bg-red-50 text-red-700 border-red-200',
-  'Clarification Requested': 'bg-amber-50 text-amber-700 border-amber-200',
+  'Clarification Requested': 'bg-slate-100 text-slate-700 border-slate-300',
   'Negotiation Requested': 'bg-amber-50 text-amber-700 border-amber-200',
 };
 

@@ -394,7 +394,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         channel: 'customer',
         authorName: 'David Chen',
         authorRole: 'Customer',
-        body: 'Approved — please proceed with the replacement.',
+        body: 'Approved.',
         date: '2026-09-07T19:10:00+05:30',
         decision: 'Approved',
       }),
