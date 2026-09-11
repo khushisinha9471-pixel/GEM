@@ -16,7 +16,7 @@ export type FinalOutcome =
   | 'Acknowledged'
   | 'Payment Timing Confirmed';
 
-export type CustomerDecision = 'Approved' | 'Rejected' | 'Clarification Requested' | 'Negotiation Requested';
+export type CustomerDecision = 'Approved' | 'Approve with Condition' | 'Rejected' | 'Clarification Requested' | 'Negotiation Requested';
 
 export const APPROVAL_TYPES: ApprovalType[] = ['O&A', 'Purchase', 'Engineering Request', 'Invoice Acknowledgement'];
 
@@ -40,6 +40,7 @@ export const FINAL_OUTCOMES: FinalOutcome[] = [
 
 export const CUSTOMER_DECISIONS: CustomerDecision[] = [
   'Approved',
+  'Approve with Condition',
   'Rejected',
   'Clarification Requested',
   'Negotiation Requested',

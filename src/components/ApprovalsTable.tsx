@@ -7,6 +7,7 @@ import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail } from 'lucide-re
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'Approve with Condition': 'bg-sky-50 text-sky-700 border-sky-200',
   Rejected: 'bg-red-50 text-red-700 border-red-200',
   'Clarification Requested': 'bg-amber-50 text-amber-700 border-amber-200',
   'Negotiation Requested': 'bg-amber-50 text-amber-700 border-amber-200',
@@ -65,7 +66,7 @@ export const ApprovalsTable: React.FC<{
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
             <th className="px-3 py-3 text-right">Cost</th>
-            <th className="px-3 py-3">Approval Requested</th>
+            <th className="px-3 py-3">Approval Request</th>
             <th className="px-3 py-3">{customerColumnLabel}</th>
             <th className="px-3 py-3">GEM Comment</th>
           </tr>
@@ -134,14 +135,14 @@ export const ApprovalsTable: React.FC<{
                 </td>
 
                 <td className="px-3 py-3 align-top text-sm text-slate">
-                  <ExpandableText text={a.requirement} className="text-sm text-slate" threshold={110} />
+                  <ExpandableText text={a.requirement} className="text-sm text-slate" />
                 </td>
 
                 <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
 
                 <td
                   onClick={approvalReqClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${approvalReqClickable ? 'cursor-pointer' : ''}`}
+                  className={`px-3 py-3 align-top ${approvalReqClickable ? 'cursor-pointer bg-amber-50/60' : ''}`}
                 >
                   {a.customerDecision ? (
                     <span
@@ -150,9 +151,7 @@ export const ApprovalsTable: React.FC<{
                       {a.customerDecision}
                     </span>
                   ) : role === 'customer' ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100">
-                      Response Needed
-                    </span>
+                    <span className="text-sm font-medium text-amber-700">Click to respond</span>
                   ) : (
                     <span className="text-xs italic text-slate/60">Awaiting decision</span>
                   )}
@@ -196,27 +195,38 @@ export const ApprovalsTable: React.FC<{
   );
 };
 
-const ExpandableText: React.FC<{ text: string; className?: string; threshold?: number }> = ({
-  text,
-  className = 'text-sm text-slate',
-  threshold = 110,
-}) => {
+const ExpandableText: React.FC<{ text: string; className?: string }> = ({ text, className = 'text-sm text-slate' }) => {
   const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
-  const overflowing = text.length > threshold;
+  const [overflowing, setOverflowing] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const textRef = React.useRef<HTMLParagraphElement>(null);
+
+  const measure = React.useCallback(() => {
+    const el = textRef.current;
+    if (el) setOverflowing(el.scrollHeight > el.clientHeight + 1);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    measure();
+  }, [text, measure]);
+
+  React.useEffect(() => {
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [measure]);
 
   React.useEffect(() => {
     if (!open) return;
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
   return (
-    <div ref={ref} className={`relative ${overflowing ? 'pr-4' : ''}`}>
-      <p className={`line-clamp-2 ${className}`}>{text}</p>
+    <div ref={containerRef} className={`relative ${overflowing ? 'pr-4' : ''}`}>
+      <p ref={textRef} className={`line-clamp-2 ${className}`}>{text}</p>
       {overflowing && (
         <>
           <button
@@ -246,7 +256,7 @@ const ExpandableText: React.FC<{ text: string; className?: string; threshold?: n
 
 const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCsmResponse>> }> = ({ message }) => (
   <div className="min-w-0">
-    <ExpandableText text={message.body} className="text-sm leading-snug text-navy" threshold={140} />
+    <ExpandableText text={message.body} className="text-sm leading-snug text-navy" />
     <div className="mt-1 flex items-center gap-2 text-[11px] text-slate">
       <span className="font-medium">{formatDateTime(message.date)}</span>
       {message.capturedFromEmail && (

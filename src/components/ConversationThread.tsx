@@ -11,6 +11,7 @@ const roleStyles: Record<string, { bubble: string; align: string; label: string 
 
 const DECISION_BADGE_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700',
+  'Approve with Condition': 'bg-sky-50 text-sky-700',
   Rejected: 'bg-red-50 text-red-700',
   'Clarification Requested': 'bg-amber-50 text-amber-700',
   'Negotiation Requested': 'bg-amber-50 text-amber-700',

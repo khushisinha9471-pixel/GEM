@@ -14,6 +14,7 @@ type Tab = 'conversation' | 'attachments';
 
 const DECISION_BUTTON_STYLES: Record<CustomerDecision, string> = {
   Approved: 'border-emerald-300 bg-emerald-50 text-emerald-700',
+  'Approve with Condition': 'border-sky-300 bg-sky-50 text-sky-700',
   Rejected: 'border-red-300 bg-red-50 text-red-700',
   'Clarification Requested': 'border-amber-300 bg-amber-50 text-amber-700',
   'Negotiation Requested': 'border-amber-300 bg-amber-50 text-amber-700',
