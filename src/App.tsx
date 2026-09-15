@@ -34,7 +34,7 @@ const AppShell: React.FC = () => {
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
     .filter((a) => (filters.subtype === 'All' ? true : a.subtype === filters.subtype))
     .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())))
-    .sort((a, b) => b.seq - a.seq);
+    .sort((a, b) => a.seq - b.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
   const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);

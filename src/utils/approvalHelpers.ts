@@ -51,7 +51,7 @@ export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: 
   if (!id) return null;
   const idxFiltered = filtered.findIndex((a) => a.id === id);
   if (idxFiltered >= 0) return idxFiltered + 1;
-  const base = [...approvals].sort((a, b) => b.seq - a.seq);
+  const base = [...approvals].sort((a, b) => a.seq - b.seq);
   const idxBase = base.findIndex((a) => a.id === id);
   return idxBase >= 0 ? idxBase + 1 : null;
 }
