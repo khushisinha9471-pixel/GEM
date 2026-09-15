@@ -44,18 +44,6 @@ export function approvalRequestUpdatedAt(a: Approval): string {
   return decisionDate(a) ?? latestCsmResponse(a)?.date ?? a.createdAt;
 }
 
-// Matches the row number shown in the table's S.No. column for this approval:
-// its position in the currently filtered/sorted list, falling back to its
-// position in the full default-sorted list if it's no longer in view.
-export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: string | null): number | null {
-  if (!id) return null;
-  const idxFiltered = filtered.findIndex((a) => a.id === id);
-  if (idxFiltered >= 0) return idxFiltered + 1;
-  const base = [...approvals].sort((a, b) => a.seq - b.seq);
-  const idxBase = base.findIndex((a) => a.id === id);
-  return idxBase >= 0 ? idxBase + 1 : null;
-}
-
 const OVERDUE_THRESHOLD_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
 
 // Still awaiting a customer decision and has been open for more than 10 days

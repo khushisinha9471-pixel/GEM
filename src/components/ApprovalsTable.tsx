@@ -80,10 +80,10 @@ export const ApprovalsTable: React.FC<{
 
   const groups = APPROVAL_TYPES.map((t) => ({
     type: t,
-    rows: approvals.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === t),
+    rows: approvals.filter((a) => a.type === t),
   })).filter((g) => g.rows.length > 0);
 
-  function renderRow(a: Approval, idx: number) {
+  function renderRow(a: Approval) {
     const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
@@ -92,7 +92,7 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="px-2 py-3 align-top text-right text-xs text-slate">{idx + 1}</td>
+                <td className="px-2 py-3 align-top text-right text-xs text-slate">{a.seq}</td>
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -305,7 +305,7 @@ export const ApprovalsTable: React.FC<{
                   </button>
                 </td>
               </tr>
-              {!collapsedGroups.has(g.type) && g.rows.map(({ a, idx }) => renderRow(a, idx))}
+              {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a))}
             </React.Fragment>
           ))}
         </tbody>
