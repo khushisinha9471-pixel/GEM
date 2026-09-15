@@ -121,7 +121,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               }}
               className="select-input"
             >
-              <option value="">Select an approval type</option>
+              <option value="" disabled hidden>Select an approval type</option>
               {APPROVAL_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {t}
