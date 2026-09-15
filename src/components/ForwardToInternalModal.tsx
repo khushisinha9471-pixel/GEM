@@ -134,10 +134,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
             />
             <span className="flex-1">
               <span className="text-sm font-semibold text-navy">CC Customer</span>
-              <span className="mt-0.5 block text-xs text-slate">
-                Include {ccNames} on this email. The internal member's reply — and this thread — will appear directly
-                in the customer conversation, recorded automatically on the portal.
-              </span>
+              <span className="mt-0.5 block text-xs text-slate">CC all mapped customers</span>
             </span>
           </label>
 
