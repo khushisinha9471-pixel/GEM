@@ -12,7 +12,7 @@ import { CUSTOMERS } from '../data/seed';
 export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
   const { dispatch } = useStore();
   const [recipientId, setRecipientId] = React.useState('');
-  const [requestType, setRequestType] = React.useState(REQUEST_TYPES[0]);
+  const [requestType, setRequestType] = React.useState('');
   const [question, setQuestion] = React.useState('');
   const [ccCustomer, setCcCustomer] = React.useState(true);
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
@@ -24,10 +24,10 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const filteredMembers = INTERNAL_MEMBERS.filter((m) => `${m.name} ${m.role}`.toLowerCase().includes(query.toLowerCase()));
   const conversationHistory = customerVisibleMessages(approval);
 
-  const subjectLine = `[${approval.id}] ${requestType} Requested – ${itemPartLabel(approval)}`;
+  const subjectLine = `[${approval.id}] ${requestType ? `${requestType} ` : ''}Requested – ${itemPartLabel(approval)}`;
 
   function send() {
-    if (!recipient || !question.trim()) return;
+    if (!recipient || !requestType || !question.trim()) return;
     dispatch({
       type: 'FORWARD_TO_INTERNAL',
       approvalId: approval.id,
@@ -102,8 +102,11 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
           </div>
 
           <div>
-            <label className="field-label">Request Type</label>
+            <label className="field-label">Request Type *</label>
             <select value={requestType} onChange={(e) => setRequestType(e.target.value)} className="select-input">
+              <option value="" disabled hidden>
+                Select a request type
+              </option>
               {REQUEST_TYPES.map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -118,7 +121,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               rows={4}
-              placeholder="Write your message to the internal member — e.g. Customer has requested an engineer's recommendation. Please advise whether we should proceed with the repair or replace the part."
+              placeholder="Input the message you want to send to the internal member"
               className="textarea-input"
             />
           </div>
@@ -210,7 +213,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
           <button onClick={onClose} className="btn-secondary">
             Cancel
           </button>
-          <button onClick={send} disabled={!recipient || !question.trim()} className="btn-primary">
+          <button onClick={send} disabled={!recipient || !requestType || !question.trim()} className="btn-primary">
             <Send size={14} />
             Send Email
           </button>
