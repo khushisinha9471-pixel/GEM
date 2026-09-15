@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Send, MessagesSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Approval, Attachment } from '../types';
-import { INTERNAL_MEMBERS, REQUEST_TYPES } from '../data/seed';
+import { INTERNAL_MEMBERS } from '../data/seed';
 import { AttachmentManager } from './AttachmentManager';
 import { ConversationThread } from './ConversationThread';
 import { useStore, genForwardId } from '../state/store';
@@ -12,7 +12,6 @@ import { CUSTOMERS } from '../data/seed';
 export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
   const { dispatch } = useStore();
   const [recipientId, setRecipientId] = React.useState('');
-  const [requestType, setRequestType] = React.useState('');
   const [question, setQuestion] = React.useState('');
   const [ccCustomer, setCcCustomer] = React.useState(true);
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
@@ -24,10 +23,10 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const filteredMembers = INTERNAL_MEMBERS.filter((m) => `${m.name} ${m.role}`.toLowerCase().includes(query.toLowerCase()));
   const conversationHistory = customerVisibleMessages(approval);
 
-  const subjectLine = `[${approval.id}] ${requestType ? `${requestType} ` : ''}Requested – ${itemPartLabel(approval)}`;
+  const subjectLine = `[${approval.id}] Internal Input Requested – ${itemPartLabel(approval)}`;
 
   function send() {
-    if (!recipient || !requestType || !question.trim()) return;
+    if (!recipient || !question.trim()) return;
     dispatch({
       type: 'FORWARD_TO_INTERNAL',
       approvalId: approval.id,
@@ -36,7 +35,6 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         recipientName: recipient.name,
         recipientRole: recipient.role,
         recipientEmail: recipient.email,
-        requestType,
         question: question.trim(),
         attachments,
         sentAt: new Date().toISOString(),
@@ -99,20 +97,6 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
                 {filteredMembers.length === 0 && <p className="px-3 py-2 text-xs text-slate">No matches.</p>}
               </div>
             )}
-          </div>
-
-          <div>
-            <label className="field-label">Request Type *</label>
-            <select value={requestType} onChange={(e) => setRequestType(e.target.value)} className="select-input">
-              <option value="" disabled hidden>
-                Select a request type
-              </option>
-              {REQUEST_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>
@@ -213,7 +197,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
           <button onClick={onClose} className="btn-secondary">
             Cancel
           </button>
-          <button onClick={send} disabled={!recipient || !requestType || !question.trim()} className="btn-primary">
+          <button onClick={send} disabled={!recipient || !question.trim()} className="btn-primary">
             <Send size={14} />
             Send Email
           </button>

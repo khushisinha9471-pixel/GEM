@@ -137,7 +137,7 @@ function reducer(state: State, action: Action): State {
             date: nowIso(),
             actor: 'Harini V (CSM)',
             action: 'Forwarded to internal member',
-            detail: `Sent to ${action.forwardRequest.recipientName} (${action.forwardRequest.recipientRole}) via ${action.forwardRequest.sentVia} — ${action.forwardRequest.requestType}.${
+            detail: `Sent to ${action.forwardRequest.recipientName} (${action.forwardRequest.recipientRole}) via ${action.forwardRequest.sentVia}.${
               action.forwardRequest.ccCustomer ? ' Customer cc\'d.' : ''
             }`,
           },

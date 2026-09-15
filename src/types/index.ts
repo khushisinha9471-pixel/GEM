@@ -77,7 +77,6 @@ export interface InternalForwardRequest {
   recipientName: string;
   recipientRole: string;
   recipientEmail: string;
-  requestType: string;
   question: string;
   attachments: Attachment[];
   sentAt: string; // ISO

@@ -166,7 +166,7 @@ export const ApprovalDetailPanel: React.FC<{
                         Awaiting response from {f.recipientName} ({f.recipientRole})
                       </div>
                       <p className="mt-1 text-xs text-slate">
-                        {f.requestType} request sent via {f.sentVia} on {formatDateTime(f.sentAt)}
+                        Request sent via {f.sentVia} on {formatDateTime(f.sentAt)}
                         {f.ccCustomer ? ' — customer cc\'d' : ' — internal only'}
                       </p>
                       <p className="mt-1 text-xs italic text-slate">&ldquo;{f.question}&rdquo;</p>

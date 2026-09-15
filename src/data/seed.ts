@@ -33,15 +33,6 @@ export const INTERNAL_MEMBERS: InternalMember[] = [
   { id: 'int-james', name: 'James Carter', role: 'Cost Analyst', email: 'james.carter@gem-mro.com' },
 ];
 
-export const REQUEST_TYPES = [
-  'Technical Recommendation',
-  'Repair Recommendation',
-  'Replacement Recommendation',
-  'Engineering Review',
-  'Cost Review',
-  'Other',
-];
-
 export const REPORTS_LIBRARY: ReportLibraryItem[] = [
   { id: 'rpt-1', name: 'HPT Inspection Report', type: 'Inspection', date: '2026-09-08' },
   { id: 'rpt-2', name: 'Engineering Recommendation', type: 'Engineering', date: '2026-09-09' },
