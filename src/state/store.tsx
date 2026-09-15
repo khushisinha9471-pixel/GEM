@@ -24,7 +24,6 @@ interface State {
   approvals: Approval[];
   notifications: AppNotification[];
   toasts: Toast[];
-  emailConnection: { provider: 'Gmail' | 'Outlook' | null; account: string | null };
 }
 
 type Action =
@@ -40,8 +39,7 @@ type Action =
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
   | { type: 'MARK_ALL_NOTIFICATIONS_READ' }
   | { type: 'ADD_TOAST'; toast: Toast }
-  | { type: 'DISMISS_TOAST'; id: string }
-  | { type: 'SET_EMAIL_CONNECTION'; provider: 'Gmail' | 'Outlook'; account: string };
+  | { type: 'DISMISS_TOAST'; id: string };
 
 function nowIso() {
   return new Date().toISOString();
@@ -293,9 +291,6 @@ function reducer(state: State, action: Action): State {
     case 'DISMISS_TOAST': {
       return { ...state, toasts: state.toasts.filter((t) => t.id !== action.id) };
     }
-    case 'SET_EMAIL_CONNECTION': {
-      return { ...state, emailConnection: { provider: action.provider, account: action.account } };
-    }
     default:
       return state;
   }
@@ -324,7 +319,6 @@ const initialState: State = {
     },
   ],
   toasts: [],
-  emailConnection: { provider: 'Gmail', account: 'khushi.work9471@gmail.com' },
 };
 
 interface StoreValue {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Send, Mail, MessagesSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Send, MessagesSquare, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Approval, Attachment } from '../types';
 import { INTERNAL_MEMBERS, REQUEST_TYPES } from '../data/seed';
 import { AttachmentManager } from './AttachmentManager';
@@ -10,16 +10,13 @@ import { customerVisibleMessages } from '../utils/approvalHelpers';
 import { CUSTOMERS } from '../data/seed';
 
 export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () => void }> = ({ approval, onClose }) => {
-  const { state, dispatch } = useStore();
+  const { dispatch } = useStore();
   const [recipientId, setRecipientId] = React.useState('');
   const [requestType, setRequestType] = React.useState(REQUEST_TYPES[0]);
   const [question, setQuestion] = React.useState(approval.requirement);
   const [ccCustomer, setCcCustomer] = React.useState(true);
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
-  const [provider, setProvider] = React.useState<'Gmail' | 'Outlook'>(state.emailConnection.provider ?? 'Gmail');
   const [query, setQuery] = React.useState('');
-  const [sendingAccount, setSendingAccount] = React.useState(state.emailConnection.account ?? '');
-  const [testRecipientEmail, setTestRecipientEmail] = React.useState('');
   const [includeHistory, setIncludeHistory] = React.useState(true);
   const [historyExpanded, setHistoryExpanded] = React.useState(false);
 
@@ -28,13 +25,9 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const conversationHistory = customerVisibleMessages(approval);
 
   const subjectLine = `[${approval.id}] ${requestType} Requested – ${itemPartLabel(approval)}`;
-  const effectiveRecipientEmail = testRecipientEmail.trim() || recipient?.email;
 
   function send() {
     if (!recipient || !question.trim()) return;
-    if (sendingAccount.trim() && sendingAccount.trim() !== state.emailConnection.account) {
-      dispatch({ type: 'SET_EMAIL_CONNECTION', provider, account: sendingAccount.trim() });
-    }
     dispatch({
       type: 'FORWARD_TO_INTERNAL',
       approvalId: approval.id,
@@ -42,12 +35,12 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         id: genForwardId(),
         recipientName: recipient.name,
         recipientRole: recipient.role,
-        recipientEmail: effectiveRecipientEmail ?? recipient.email,
+        recipientEmail: recipient.email,
         requestType,
         question: question.trim(),
         attachments,
         sentAt: new Date().toISOString(),
-        sentVia: provider,
+        sentVia: 'Gmail',
         status: 'awaiting',
         includeHistory,
         includedMessages: includeHistory ? conversationHistory : [],
@@ -194,7 +187,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
             <p className="text-xs font-semibold text-slate">Email Preview</p>
             <div className="mt-2 space-y-1 text-xs text-navy">
               <p>
-                <span className="font-medium text-slate">To:</span> {effectiveRecipientEmail ?? '—'}
+                <span className="font-medium text-slate">To:</span> {recipient?.email ?? '—'}
               </p>
               {ccCustomer && (
                 <p>
@@ -216,52 +209,6 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
             </div>
           </div>
 
-          <div className="rounded-xl border border-line p-3">
-            <p className="text-sm font-semibold text-navy">Email Integration — Live Test</p>
-            <p className="mt-0.5 text-xs text-slate">
-              Connects a real Gmail or Outlook mailbox. The Approval ID is identified from the subject line and
-              captures the reply automatically once it arrives — no manual copy/paste.
-            </p>
-
-            <div className="mt-3 flex gap-2">
-              {(['Gmail', 'Outlook'] as const).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setProvider(p)}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium ${
-                    provider === p ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate hover:bg-surface'
-                  }`}
-                >
-                  <Mail size={14} />
-                  {p}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-3">
-              <label className="field-label">Sending Account</label>
-              <input
-                value={sendingAccount}
-                onChange={(e) => setSendingAccount(e.target.value)}
-                placeholder="you@company.com"
-                className="field-input"
-              />
-            </div>
-
-            <div className="mt-3">
-              <label className="field-label">Test Recipient Email (optional)</label>
-              <input
-                value={testRecipientEmail}
-                onChange={(e) => setTestRecipientEmail(e.target.value)}
-                placeholder="Override the recipient above for a live round-trip test"
-                className="field-input"
-              />
-              <p className="mt-1 text-xs text-slate">
-                Leave blank to send to {recipient ? recipient.email : 'the selected recipient'}. Set this to run a
-                real send → reply → auto-capture test against this approval.
-              </p>
-            </div>
-          </div>
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-line px-5 py-3.5">
