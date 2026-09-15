@@ -38,7 +38,7 @@ export const SummaryCards: React.FC<{
         <div className="mt-1 text-xl font-bold text-navy">{overdueCount}</div>
       </button>
       <div
-        title="Total accumulated cost across all open approvals still awaiting a customer decision"
+        title="Total accumulated cost associated with all open approvals"
         className="min-w-[150px] rounded-xl border border-line bg-white p-3 shadow-card"
       >
         <div className="flex items-center gap-1.5">
