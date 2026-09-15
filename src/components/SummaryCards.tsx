@@ -32,7 +32,6 @@ export const SummaryCards: React.FC<{
         }`}
       >
         <div className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
           <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Overdue Approvals</span>
         </div>
         <div className="mt-1 text-xl font-bold text-navy">{overdueCount}</div>
@@ -42,7 +41,6 @@ export const SummaryCards: React.FC<{
         className="min-w-[150px] rounded-xl border border-line bg-white p-3 shadow-card"
       >
         <div className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-navy" />
           <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Pending Approvals Value</span>
         </div>
         <div className="mt-1 text-xl font-bold text-navy">{formatCost(pendingValue)}</div>
