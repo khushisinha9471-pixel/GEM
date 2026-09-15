@@ -13,7 +13,7 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
   const { dispatch } = useStore();
   const [recipientId, setRecipientId] = React.useState('');
   const [requestType, setRequestType] = React.useState(REQUEST_TYPES[0]);
-  const [question, setQuestion] = React.useState(approval.requirement);
+  const [question, setQuestion] = React.useState('');
   const [ccCustomer, setCcCustomer] = React.useState(true);
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
   const [query, setQuery] = React.useState('');
@@ -118,10 +118,9 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               rows={4}
-              placeholder="Customer has requested an engineer's recommendation. Please advise whether we should proceed with the repair or replace the part."
+              placeholder="Write your message to the internal member — e.g. Customer has requested an engineer's recommendation. Please advise whether we should proceed with the repair or replace the part."
               className="textarea-input"
             />
-            <p className="mt-1 text-xs text-slate">Pre-filled with the requirement — edit freely before sending.</p>
           </div>
 
           <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-line p-3">
