@@ -14,7 +14,7 @@ const DECISION_STYLES: Record<CustomerDecision, string> = {
 
 const DecisionPill: React.FC<{ decision: CustomerDecision }> = ({ decision }) => (
   <span
-    className={`block w-full rounded-full border px-2 py-1 text-center text-[10px] font-semibold leading-tight ${DECISION_STYLES[decision]}`}
+    className={`flex h-[34px] w-full items-center justify-center rounded-full border px-2 text-center text-[10px] font-semibold leading-tight ${DECISION_STYLES[decision]}`}
   >
     {decision}
   </span>
@@ -360,7 +360,7 @@ const MessagePreview: React.FC<{ message: NonNullable<ReturnType<typeof latestCs
   openable,
 }) => (
   <div className="min-w-0">
-    <ExpandableText text={message.body} className="text-sm leading-snug text-navy" />
+    <ExpandableText text={message.body} className="text-sm leading-snug text-navy" mode={openable ? 'popover' : 'inline'} />
     <div className="mt-1 flex items-center gap-2 text-[11px] text-slate">
       <span className="font-medium">{formatDateTime(message.date)}</span>
       {message.capturedFromEmail && (
