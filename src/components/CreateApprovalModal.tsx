@@ -177,7 +177,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               value={requirement}
               onChange={(e) => setRequirement(e.target.value)}
               rows={4}
-              placeholder="What needs approval, and why — e.g. HPT blade needs additional repair beyond the approved workscope."
+              placeholder="Why this is needed — e.g. additional repair required beyond the approved workscope, based on inspection findings."
               className="textarea-input"
             />
             {errors.requirement && <p className="mt-1 text-xs text-red-600">{errors.requirement}</p>}
