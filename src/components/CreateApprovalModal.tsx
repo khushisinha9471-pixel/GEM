@@ -217,7 +217,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               value={csmResponse}
               onChange={(e) => setCsmResponse(e.target.value)}
               rows={3}
-              placeholder="Your message to the customer — e.g. Please review and confirm whether the repair may proceed."
+              placeholder="Your additional message..."
               className="textarea-input"
             />
           </div>
