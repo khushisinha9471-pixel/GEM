@@ -148,11 +148,7 @@ export const ApprovalDetailPanel: React.FC<{
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {tab === 'conversation' && (
             <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-slate">
-                  Customer-visible messages and internal replies in one thread — internal-only messages are badged and
-                  stay private.
-                </p>
+              <div className="flex items-center justify-end">
                 <button onClick={() => setForwardOpen(true)} className="btn-secondary flex-none">
                   <Send size={14} />
                   Forward to Internal Member
