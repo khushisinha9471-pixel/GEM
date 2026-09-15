@@ -14,7 +14,7 @@ const DECISION_STYLES: Record<CustomerDecision, string> = {
 
 const DecisionPill: React.FC<{ decision: CustomerDecision }> = ({ decision }) => (
   <span
-    className={`flex w-full min-w-0 items-center justify-center break-words rounded-full border px-2 py-1 text-center text-[10px] font-semibold leading-tight ${DECISION_STYLES[decision]}`}
+    className={`block w-full rounded-full border px-2 py-1 text-center text-[10px] font-semibold leading-tight ${DECISION_STYLES[decision]}`}
   >
     {decision}
   </span>
@@ -169,13 +169,13 @@ export const ApprovalsTable: React.FC<{
                 <td className="relative px-3 py-3 align-top">
                   {approvalReqClickable ? (
                     <div ref={decisionOpenId === a.id ? decisionRef : undefined} className="relative">
-                      <button onClick={() => toggleDecisionOpen(a)} className="flex w-full min-w-0 items-center gap-1">
+                      <button onClick={() => toggleDecisionOpen(a)} className="relative block w-full pr-4 text-left">
                         {a.customerDecision ? (
                           <DecisionPill decision={a.customerDecision} />
                         ) : (
                           <span className="text-sm font-medium text-amber-700">Click to respond</span>
                         )}
-                        <ChevronDown size={12} className="shrink-0 text-slate" />
+                        <ChevronDown size={12} className="absolute right-0 top-1 text-slate" />
                       </button>
                       <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
 
