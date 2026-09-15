@@ -19,6 +19,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
   const [partDescription, setPartDescription] = React.useState('');
   const [requirement, setRequirement] = React.useState('');
   const [cost, setCost] = React.useState('');
+  const [expectedClosureDate, setExpectedClosureDate] = React.useState('');
   const [csmResponse, setCsmResponse] = React.useState('');
   const [attachments, setAttachments] = React.useState<Attachment[]>([]);
   const [access, setAccess] = React.useState<'all' | 'selected'>('all');
@@ -81,6 +82,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
       ],
       outcome: null,
       customerDecision: null,
+      responseDueAt: expectedClosureDate ? `${expectedClosureDate}T23:59:59+05:30` : null,
     };
 
     dispatch({ type: 'CREATE_APPROVAL', approval });
@@ -194,6 +196,20 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
                 className="field-input pl-6"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="field-label">Expected Approval Closure Date</label>
+            <input
+              type="date"
+              value={expectedClosureDate}
+              onChange={(e) => setExpectedClosureDate(e.target.value)}
+              className="field-input"
+            />
+            <p className="mt-1 text-xs text-slate">
+              Used to flag this approval as overdue if it's still awaiting a decision after this date — it won't appear
+              in the table.
+            </p>
           </div>
 
           <div>

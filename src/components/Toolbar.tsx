@@ -41,6 +41,14 @@ export const Toolbar: React.FC<{
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">
+      <button
+        onClick={onCreate}
+        className="flex items-center gap-2 rounded-lg bg-navy px-3.5 py-2 text-sm font-semibold text-white shadow-card hover:bg-navy-600"
+      >
+        <Plus size={15} />
+        Create Approval
+      </button>
+
       <div className="flex w-64 items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 shadow-card">
         <Search size={16} className="text-slate" />
         <input
@@ -148,14 +156,6 @@ export const Toolbar: React.FC<{
           </div>
         )}
       </div>
-
-      <button
-        onClick={onCreate}
-        className="flex items-center gap-2 rounded-lg bg-navy px-3.5 py-2 text-sm font-semibold text-white shadow-card hover:bg-navy-600"
-      >
-        <Plus size={15} />
-        Create Approval
-      </button>
     </div>
   );
 };
