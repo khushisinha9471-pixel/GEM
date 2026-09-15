@@ -14,7 +14,7 @@ const DECISION_STYLES: Record<CustomerDecision, string> = {
 
 const DecisionPill: React.FC<{ decision: CustomerDecision }> = ({ decision }) => (
   <span
-    className={`flex w-full items-center justify-center rounded-full border px-2.5 py-1 text-center text-xs font-semibold ${DECISION_STYLES[decision]}`}
+    className={`flex w-full min-w-0 items-center justify-center break-words rounded-full border px-2 py-1 text-center text-[10px] font-semibold leading-tight ${DECISION_STYLES[decision]}`}
   >
     {decision}
   </span>
@@ -23,7 +23,7 @@ const DecisionPill: React.FC<{ decision: CustomerDecision }> = ({ decision }) =>
 export const ApprovalsTable: React.FC<{
   approvals: Approval[];
   role: 'csm' | 'customer';
-  onOpenConversation: (approval: Approval) => void;
+  onOpenConversation: (approval: Approval, draftDecision?: CustomerDecision) => void;
   onReopen?: (approval: Approval) => void;
   onRequestClose?: (approval: Approval) => void;
   onQuickDecision?: (approval: Approval, decision: CustomerDecision) => void;
@@ -169,7 +169,7 @@ export const ApprovalsTable: React.FC<{
                 <td className="relative px-3 py-3 align-top">
                   {approvalReqClickable ? (
                     <div ref={decisionOpenId === a.id ? decisionRef : undefined} className="relative">
-                      <button onClick={() => toggleDecisionOpen(a)} className="flex w-full items-center gap-1">
+                      <button onClick={() => toggleDecisionOpen(a)} className="flex w-full min-w-0 items-center gap-1">
                         {a.customerDecision ? (
                           <DecisionPill decision={a.customerDecision} />
                         ) : (
@@ -200,7 +200,7 @@ export const ApprovalsTable: React.FC<{
                               type="button"
                               onClick={() => {
                                 setDecisionOpenId(null);
-                                onOpenConversation(a);
+                                onOpenConversation(a, pendingDecision ?? undefined);
                               }}
                               className="flex-1 rounded-md border border-line px-2 py-1.5 text-[11px] font-semibold text-slate hover:bg-surface"
                             >

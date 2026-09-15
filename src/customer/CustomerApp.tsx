@@ -17,6 +17,7 @@ const CustomerAppShell: React.FC = () => {
   const [statusCard, setStatusCard] = React.useState<ApprovalStatus | 'All'>('All');
   const [overdueOnly, setOverdueOnly] = React.useState(false);
   const [selectedApprovalId, setSelectedApprovalId] = React.useState<string | null>(null);
+  const [draftDecision, setDraftDecision] = React.useState<CustomerDecision | null>(null);
 
   const approvals = state.approvals;
   const openCount = approvals.filter((a) => a.status === 'Open').length;
@@ -40,9 +41,14 @@ const CustomerAppShell: React.FC = () => {
     dispatch({ type: 'ADD_CUSTOMER_DECISION', approvalId: a.id, decision, comment: '', attachments: [] });
   }
 
+  function openApproval(id: string, decision?: CustomerDecision) {
+    setSelectedApprovalId(id);
+    setDraftDecision(decision ?? null);
+  }
+
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface">
-      <CustomerHeader onOpenApproval={setSelectedApprovalId} />
+      <CustomerHeader onOpenApproval={(id) => openApproval(id)} />
 
       <div className="flex flex-1 flex-col overflow-hidden px-8">
         <div className="flex-none pb-4 pt-6">
@@ -77,7 +83,7 @@ const CustomerAppShell: React.FC = () => {
           <ApprovalsTable
             approvals={filtered}
             role="customer"
-            onOpenConversation={(a: Approval) => setSelectedApprovalId(a.id)}
+            onOpenConversation={(a: Approval, decision) => openApproval(a.id, decision)}
             onQuickDecision={handleQuickDecision}
             customerColumnLabel="Your Comment"
           />
@@ -90,7 +96,11 @@ const CustomerAppShell: React.FC = () => {
         <CustomerApprovalDetail
           approval={selectedApproval}
           serial={selectedSerial ?? 0}
-          onClose={() => setSelectedApprovalId(null)}
+          initialDecision={draftDecision}
+          onClose={() => {
+            setSelectedApprovalId(null);
+            setDraftDecision(null);
+          }}
         />
       )}
     </div>

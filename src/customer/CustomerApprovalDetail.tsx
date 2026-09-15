@@ -11,21 +11,25 @@ import { CustomerAttachmentPicker } from './CustomerAttachmentPicker';
 
 type Tab = 'conversation' | 'attachments';
 
-export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: number; onClose: () => void }> = ({
-  approval,
-  serial,
-  onClose,
-}) => {
+export const CustomerApprovalDetail: React.FC<{
+  approval: Approval;
+  serial: number;
+  onClose: () => void;
+  initialDecision?: CustomerDecision | null;
+}> = ({ approval, serial, onClose, initialDecision }) => {
   const { dispatch } = useCustomerStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
-  const [decision, setDecision] = React.useState<CustomerDecision | null>(approval.customerDecision ?? null);
+  const [decision, setDecision] = React.useState<CustomerDecision | null>(
+    initialDecision ?? approval.customerDecision ?? null
+  );
   const [replyBody, setReplyBody] = React.useState('');
   const [replyAttachments, setReplyAttachments] = React.useState<Attachment[]>([]);
 
   // A reply to an existing decision shouldn't force re-picking it — default
-  // the dropdown to whatever's already on record whenever the approval changes.
+  // the dropdown to whatever was picked before opening (e.g. from the quick
+  // table dropdown), falling back to whatever's already on record.
   React.useEffect(() => {
-    setDecision(approval.customerDecision ?? null);
+    setDecision(initialDecision ?? approval.customerDecision ?? null);
     setReplyBody('');
     setReplyAttachments([]);
   }, [approval.id]);
