@@ -94,7 +94,7 @@ export const ApprovalsTable: React.FC<{
               <tr key={a.id} className="border-b border-line last:border-0">
                 <td className="px-2 py-3 align-top text-right text-xs text-slate">{idx + 1}</td>
 
-                <td className="relative px-2 py-3 align-top">
+                <td className={`relative px-2 py-3 align-top ${isCustomer ? 'text-center' : ''}`}>
                   {role === 'csm' ? (
                     <div ref={statusOpenId === a.id ? statusRef : undefined} className="relative">
                       <button
@@ -133,7 +133,12 @@ export const ApprovalsTable: React.FC<{
                       )}
                     </div>
                   ) : (
-                    <StatusPill status={a.status} />
+                    <span
+                      title={a.status}
+                      className={`mx-auto mt-1 block h-2.5 w-2.5 rounded-full ${
+                        a.status === 'Open' ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                    />
                   )}
                 </td>
 
@@ -252,24 +257,26 @@ export const ApprovalsTable: React.FC<{
     );
   }
 
+  const isCustomer = role === 'customer';
+
   return (
     <div className="card overflow-x-auto">
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
           <col className="w-[40px]" />
-          <col className="w-[90px]" />
+          <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
           <col className="w-[100px]" />
           <col className="w-[108px]" />
-          <col className="w-[236px]" />
+          <col className={isCustomer ? 'w-[257px]' : 'w-[236px]'} />
           <col className="w-[74px]" />
           <col className="w-[112px]" />
-          <col className="w-[220px]" />
-          <col className="w-[220px]" />
+          <col className={isCustomer ? 'w-[241px]' : 'w-[220px]'} />
+          <col className={isCustomer ? 'w-[240px]' : 'w-[220px]'} />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
             <th className="px-2 py-3 text-right">S.No.</th>
-            <th className="px-2 py-3">Status</th>
+            <th className="px-2 py-3">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
