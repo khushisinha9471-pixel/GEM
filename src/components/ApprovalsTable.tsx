@@ -283,19 +283,16 @@ export const ApprovalsTable: React.FC<{
           {groups.map((g) => (
             <React.Fragment key={g.type}>
               <tr className="border-b border-line bg-surface/70">
-                <td colSpan={9} className="px-3 py-2">
+                <td colSpan={9} className="px-3 py-3">
                   <button
                     onClick={() => toggleGroupCollapsed(g.type)}
-                    className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-navy"
+                    className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
                   >
                     <ChevronDown
-                      size={14}
+                      size={16}
                       className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
                     />
                     {g.type}
-                    <span className="rounded-full bg-navy-50 px-2 py-0.5 text-[11px] font-semibold text-navy">
-                      {g.rows.length}
-                    </span>
                   </button>
                 </td>
               </tr>
