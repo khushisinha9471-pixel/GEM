@@ -1,5 +1,21 @@
 import type { Approval, ConversationMessage } from '../types';
+import { APPROVAL_TYPES } from '../types';
 import { DEMO_NOW } from '../data/seed';
+
+// Matches the row number shown in the table's S.No. column: the approval's
+// position in the type-grouped display order (groups in APPROVAL_TYPES
+// order, each internally in the given list's own sort order) — not its
+// creation sequence. Falls back to the full approvals list if the approval
+// isn't in the current filtered view.
+export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: string | null): number | null {
+  if (!id) return null;
+  const orderedFiltered = APPROVAL_TYPES.flatMap((t) => filtered.filter((a) => a.type === t));
+  const idxFiltered = orderedFiltered.findIndex((a) => a.id === id);
+  if (idxFiltered >= 0) return idxFiltered + 1;
+  const orderedAll = APPROVAL_TYPES.flatMap((t) => approvals.filter((a) => a.type === t));
+  const idxAll = orderedAll.findIndex((a) => a.id === id);
+  return idxAll >= 0 ? idxAll + 1 : null;
+}
 
 export function latestCsmResponse(a: Approval): ConversationMessage | null {
   const msgs = a.messages.filter((m) => m.channel === 'customer' && m.authorRole === 'CSM');

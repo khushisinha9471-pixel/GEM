@@ -7,7 +7,7 @@ import { CustomerToolbar, DEFAULT_CUSTOMER_FILTERS, type CustomerFilters } from 
 import { ApprovalsTable } from '../components/ApprovalsTable';
 import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
-import { searchableText, isOverdue, pendingApprovalValue } from '../utils/approvalHelpers';
+import { searchableText, serialNumberOf, isOverdue, pendingApprovalValue } from '../utils/approvalHelpers';
 import type { Approval, ApprovalStatus, CustomerDecision } from '../types';
 
 const CustomerAppShell: React.FC = () => {
@@ -41,6 +41,7 @@ const CustomerAppShell: React.FC = () => {
     .sort((a, b) => b.seq - a.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
+  const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
 
   function handleQuickDecision(a: Approval, decision: CustomerDecision) {
     dispatch({ type: 'ADD_CUSTOMER_DECISION', approvalId: a.id, decision, comment: '', attachments: [] });
@@ -100,7 +101,7 @@ const CustomerAppShell: React.FC = () => {
       {selectedApproval && (
         <CustomerApprovalDetail
           approval={selectedApproval}
-          serial={selectedApproval.seq}
+          serial={selectedSerial ?? 0}
           initialDecision={draftDecision}
           onClose={() => {
             setSelectedApprovalId(null);

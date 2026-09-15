@@ -8,7 +8,7 @@ import { ApprovalsTable } from './components/ApprovalsTable';
 import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
-import { searchableText, isOverdue, pendingApprovalValue } from './utils/approvalHelpers';
+import { searchableText, serialNumberOf, isOverdue, pendingApprovalValue } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 
 const AppShell: React.FC = () => {
@@ -42,6 +42,7 @@ const AppShell: React.FC = () => {
     .sort((a, b) => b.seq - a.seq);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
+  const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface">
@@ -101,7 +102,7 @@ const AppShell: React.FC = () => {
       {selectedApproval && (
         <ApprovalDetailPanel
           approval={selectedApproval}
-          serial={selectedApproval.seq}
+          serial={selectedSerial ?? 0}
           onClose={() => setSelectedApprovalId(null)}
           onRequestClose={(id) => dispatch({ type: 'REQUEST_CLOSE', approvalId: id })}
         />

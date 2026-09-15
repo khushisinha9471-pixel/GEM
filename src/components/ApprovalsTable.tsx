@@ -83,7 +83,7 @@ export const ApprovalsTable: React.FC<{
     rows: approvals.filter((a) => a.type === t),
   })).filter((g) => g.rows.length > 0);
 
-  function renderRow(a: Approval) {
+  function renderRow(a: Approval, rowNumber: number) {
     const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
@@ -92,7 +92,7 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="px-2 py-3 align-top text-right text-xs text-slate">{a.seq}</td>
+                <td className="px-2 py-3 align-top text-right text-xs text-slate">{rowNumber}</td>
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -289,25 +289,28 @@ export const ApprovalsTable: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {groups.map((g) => (
-            <React.Fragment key={g.type}>
-              <tr className="border-b border-line bg-surface/70">
-                <td colSpan={9} className="px-3 py-3">
-                  <button
-                    onClick={() => toggleGroupCollapsed(g.type)}
-                    className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
-                  >
-                    <ChevronDown
-                      size={16}
-                      className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
-                    />
-                    {g.type}
-                  </button>
-                </td>
-              </tr>
-              {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a))}
-            </React.Fragment>
-          ))}
+          {(() => {
+            let rowNumber = 0;
+            return groups.map((g) => (
+              <React.Fragment key={g.type}>
+                <tr className="border-b border-line bg-surface/70">
+                  <td colSpan={9} className="px-3 py-3">
+                    <button
+                      onClick={() => toggleGroupCollapsed(g.type)}
+                      className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
+                    >
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
+                      />
+                      {g.type}
+                    </button>
+                  </td>
+                </tr>
+                {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a, ++rowNumber))}
+              </React.Fragment>
+            ));
+          })()}
         </tbody>
       </table>
     </div>
