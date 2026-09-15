@@ -168,28 +168,9 @@ export const INITIAL_APPROVALS: Approval[] = [
     createdAt: '2026-09-10T09:45:00+05:30',
     messages: app001Messages,
     customerDecision: 'Clarification Requested',
-    forwardRequests: [
-      {
-        id: 'fwd-1',
-        recipientName: 'Muazzi',
-        recipientRole: 'Engineering VP',
-        recipientEmail: 'muazzi@gem-mro.com',
-        requestType: 'Repair Recommendation',
-        question:
-          'Customer has requested an engineer\'s recommendation. Please advise whether we should proceed with the repair or replace the part.',
-        attachments: [att('Inspection Report.pdf', 'reports-library', '2026-09-10', { reportType: 'Inspection' })],
-        sentAt: '2026-09-10T15:10:00+05:30',
-        sentVia: 'Gmail',
-        status: 'awaiting',
-        includeHistory: true,
-        includedMessages: app001Messages,
-        ccCustomer: true,
-      },
-    ],
     extraAudit: [
       auditEvt('2026-09-10T10:15:00+05:30', 'Harini V (CSM)', 'Customer response requested', 'Initial CSM message sent to customer.'),
       auditEvt('2026-09-10T14:20:00+05:30', 'Sarah Mitchell', 'Customer responded', 'Clarification Requested — customer requested engineering recommendation.'),
-      auditEvt('2026-09-10T15:10:00+05:30', 'Harini V (CSM)', 'Forwarded to internal member', 'Sent to Muazzi (Engineering VP) via Gmail — Repair Recommendation. Customer cc\'d.'),
     ],
   }),
 
