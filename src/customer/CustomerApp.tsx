@@ -30,7 +30,13 @@ const CustomerAppShell: React.FC = () => {
     .filter((a) => (effectiveStatus === 'All' ? true : a.status === effectiveStatus))
     .filter((a) => (overdueOnly ? isOverdue(a) : true))
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
-    .filter((a) => (filters.subtype === 'All' ? true : a.subtype === filters.subtype))
+    .filter((a) =>
+      filters.decision === 'All'
+        ? true
+        : filters.decision === 'Awaiting Decision'
+        ? !a.customerDecision
+        : a.customerDecision === filters.decision
+    )
     .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())))
     .sort((a, b) => a.seq - b.seq);
 

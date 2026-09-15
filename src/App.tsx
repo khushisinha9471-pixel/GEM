@@ -1,6 +1,6 @@
 import React from 'react';
 import { StoreProvider, useStore } from './state/store';
-import { WORK_ORDER, CUSTOMERS } from './data/seed';
+import { WORK_ORDER } from './data/seed';
 import { Header } from './components/Header';
 import { SummaryCards } from './components/SummaryCards';
 import { Toolbar, DEFAULT_FILTERS, type Filters } from './components/Toolbar';
@@ -30,9 +30,14 @@ const AppShell: React.FC = () => {
   const filtered = approvals
     .filter((a) => (effectiveStatus === 'All' ? true : a.status === effectiveStatus))
     .filter((a) => (overdueOnly ? isOverdue(a) : true))
-    .filter((a) => (filters.customerId === 'all' ? true : a.access === 'all' || a.selectedCustomerIds.includes(filters.customerId)))
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
-    .filter((a) => (filters.subtype === 'All' ? true : a.subtype === filters.subtype))
+    .filter((a) =>
+      filters.decision === 'All'
+        ? true
+        : filters.decision === 'Awaiting Decision'
+        ? !a.customerDecision
+        : a.customerDecision === filters.decision
+    )
     .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())))
     .sort((a, b) => a.seq - b.seq);
 
@@ -73,7 +78,6 @@ const AppShell: React.FC = () => {
               onSearch={setSearch}
               filters={filters}
               onFilters={setFilters}
-              customers={CUSTOMERS}
               onCreate={() => setCreateOpen(true)}
             />
           </div>

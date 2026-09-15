@@ -1,15 +1,17 @@
 import React from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
-import type { ApprovalType } from '../types';
-import { SUBTYPES_BY_TYPE, APPROVAL_TYPES } from '../types';
+import type { ApprovalType, CustomerDecision } from '../types';
+import { APPROVAL_TYPES, CUSTOMER_DECISIONS } from '../types';
+
+export type DecisionFilter = 'All' | 'Awaiting Decision' | CustomerDecision;
 
 export interface CustomerFilters {
-  status: 'All' | 'Open' | 'Closed';
   approvalType: 'All' | ApprovalType;
-  subtype: string;
+  decision: DecisionFilter;
+  status: 'All' | 'Open' | 'Closed';
 }
 
-export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = { status: 'All', approvalType: 'All', subtype: 'All' };
+export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = { approvalType: 'All', decision: 'All', status: 'All' };
 
 export const CustomerToolbar: React.FC<{
   search: string;
@@ -28,10 +30,11 @@ export const CustomerToolbar: React.FC<{
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const subtypeOptions = filters.approvalType === 'All' ? [] : SUBTYPES_BY_TYPE[filters.approvalType];
-  const activeFilterCount = [filters.status !== 'All', filters.approvalType !== 'All', filters.subtype !== 'All'].filter(
-    Boolean
-  ).length;
+  const activeFilterCount = [
+    filters.approvalType !== 'All',
+    filters.decision !== 'All',
+    filters.status !== 'All',
+  ].filter(Boolean).length;
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">
@@ -75,23 +78,10 @@ export const CustomerToolbar: React.FC<{
             </div>
 
             <div className="mt-3">
-              <label className="field-label">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => onFilters({ ...filters, status: e.target.value as CustomerFilters['status'] })}
-                className="select-input"
-              >
-                <option value="All">All</option>
-                <option value="Open">Open</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
-
-            <div className="mt-3">
-              <label className="field-label">Approval Type</label>
+              <label className="field-label">Type</label>
               <select
                 value={filters.approvalType}
-                onChange={(e) => onFilters({ ...filters, approvalType: e.target.value as CustomerFilters['approvalType'], subtype: 'All' })}
+                onChange={(e) => onFilters({ ...filters, approvalType: e.target.value as CustomerFilters['approvalType'] })}
                 className="select-input"
               >
                 <option value="All">All Types</option>
@@ -104,25 +94,32 @@ export const CustomerToolbar: React.FC<{
             </div>
 
             <div className="mt-3">
-              <label className="field-label">Subtype</label>
+              <label className="field-label">Decision</label>
               <select
-                value={filters.subtype}
-                disabled={filters.approvalType === 'All' || subtypeOptions.length === 0}
-                onChange={(e) => onFilters({ ...filters, subtype: e.target.value })}
-                className="select-input disabled:cursor-not-allowed disabled:bg-surface/60 disabled:text-slate/60"
+                value={filters.decision}
+                onChange={(e) => onFilters({ ...filters, decision: e.target.value as CustomerFilters['decision'] })}
+                className="select-input"
               >
-                <option value="All">
-                  {filters.approvalType === 'All'
-                    ? 'Select an Approval Type first'
-                    : subtypeOptions.length === 0
-                    ? 'No Subtype'
-                    : `All ${filters.approvalType} Subtypes`}
-                </option>
-                {subtypeOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
+                <option value="All">All Decisions</option>
+                <option value="Awaiting Decision">Awaiting Decision</option>
+                {CUSTOMER_DECISIONS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            <div className="mt-3">
+              <label className="field-label">Status</label>
+              <select
+                value={filters.status}
+                onChange={(e) => onFilters({ ...filters, status: e.target.value as CustomerFilters['status'] })}
+                className="select-input"
+              >
+                <option value="All">All</option>
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
               </select>
             </div>
           </div>
