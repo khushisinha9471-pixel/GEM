@@ -26,7 +26,7 @@ export const SummaryCards: React.FC<{
       </button>
       <button
         onClick={onToggleOverdue}
-        title="Open approvals with no customer decision yet, open for more than 10 days"
+        title="Approval has been open for more than 10 days"
         className={`min-w-[150px] rounded-xl border bg-white p-3 text-left shadow-card transition ${
           overdueActive ? 'border-red-400 ring-2 ring-red-200' : 'border-line hover:border-red-300'
         }`}
