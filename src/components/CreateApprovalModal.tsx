@@ -207,8 +207,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               className="field-input"
             />
             <p className="mt-1 text-xs text-slate">
-              Used to flag this approval as overdue if it's still awaiting a decision after this date — it won't appear
-              in the table.
+              Used to flag this approval as overdue if it's still awaiting a decision after this date.
             </p>
           </div>
 

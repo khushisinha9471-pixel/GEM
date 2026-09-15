@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Send } from 'lucide-react';
 import type { Approval, Attachment, CustomerDecision } from '../types';
-import { CUSTOMER_DECISIONS } from '../types';
+import { CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill, OutcomeBadge } from '../components/StatusPill';
 import { customerVisibleMessages } from '../utils/approvalHelpers';
 import { ConversationThread } from '../components/ConversationThread';
@@ -11,25 +11,6 @@ import { CustomerAttachmentPicker } from './CustomerAttachmentPicker';
 
 type Tab = 'conversation' | 'attachments';
 
-const DECISION_BUTTON_STYLES: Record<CustomerDecision, string> = {
-  Approved: 'border-emerald-300 bg-emerald-50 text-emerald-700',
-  'Approved with Condition': 'border-sky-300 bg-sky-50 text-sky-700',
-  Rejected: 'border-red-300 bg-red-50 text-red-700',
-  'Clarification Requested': 'border-slate-300 bg-slate-100 text-slate-700',
-  'Negotiation Requested': 'border-amber-300 bg-amber-50 text-amber-700',
-};
-
-// The customer picks a decision by the action they're taking ("Request
-// Clarification"); the CSM side still shows the resulting state
-// ("Clarification Requested") everywhere else — table, conversation badges.
-const CUSTOMER_DECISION_LABELS: Record<CustomerDecision, string> = {
-  Approved: 'Approved',
-  'Approved with Condition': 'Approve with Condition',
-  Rejected: 'Rejected',
-  'Clarification Requested': 'Request Clarification',
-  'Negotiation Requested': 'Request Negotiation',
-};
-
 export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: number; onClose: () => void }> = ({
   approval,
   serial,
@@ -37,16 +18,23 @@ export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: numb
 }) => {
   const { dispatch } = useCustomerStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
-  const [decision, setDecision] = React.useState<CustomerDecision | null>(null);
+  const [decision, setDecision] = React.useState<CustomerDecision | null>(approval.customerDecision ?? null);
   const [replyBody, setReplyBody] = React.useState('');
   const [replyAttachments, setReplyAttachments] = React.useState<Attachment[]>([]);
+
+  // A reply to an existing decision shouldn't force re-picking it — default
+  // the dropdown to whatever's already on record whenever the approval changes.
+  React.useEffect(() => {
+    setDecision(approval.customerDecision ?? null);
+    setReplyBody('');
+    setReplyAttachments([]);
+  }, [approval.id]);
 
   const visibleMessages = customerVisibleMessages(approval);
 
   function sendReply() {
     if (!decision) return;
     dispatch({ type: 'ADD_CUSTOMER_DECISION', approvalId: approval.id, decision, comment: replyBody.trim(), attachments: replyAttachments });
-    setDecision(null);
     setReplyBody('');
     setReplyAttachments([]);
   }
@@ -97,21 +85,19 @@ export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: numb
               <ConversationThread messages={visibleMessages} emptyLabel="No conversation yet on this approval." />
 
               <div className="rounded-xl border border-line p-4">
-                <label className="field-label">Your Response</label>
-                <div className="flex flex-wrap gap-2">
+                <label className="field-label">Your Decision</label>
+                <select
+                  value={decision ?? ''}
+                  onChange={(e) => setDecision((e.target.value || null) as CustomerDecision | null)}
+                  className="select-input"
+                >
+                  <option value="">Select a decision</option>
                   {CUSTOMER_DECISIONS.map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setDecision(d)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                        decision === d ? DECISION_BUTTON_STYLES[d] : 'border-line text-slate hover:bg-surface'
-                      }`}
-                    >
+                    <option key={d} value={d}>
                       {CUSTOMER_DECISION_LABELS[d]}
-                    </button>
+                    </option>
                   ))}
-                </div>
+                </select>
 
                 <label className="field-label mt-3">Comment (optional)</label>
                 <textarea

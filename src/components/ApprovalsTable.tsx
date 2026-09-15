@@ -1,17 +1,24 @@
 import React from 'react';
 import type { Approval, CustomerDecision } from '../types';
+import { CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill } from './StatusPill';
-import { formatCost, formatDateTime } from '../utils/format';
+import { formatCost, formatDate, formatDateTime } from '../utils/format';
 import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
 import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Approved with Condition': 'bg-sky-50 text-sky-700 border-sky-200',
   Rejected: 'bg-red-50 text-red-700 border-red-200',
   'Clarification Requested': 'bg-slate-100 text-slate-700 border-slate-300',
-  'Negotiation Requested': 'bg-amber-50 text-amber-700 border-amber-200',
 };
+
+const DecisionPill: React.FC<{ decision: CustomerDecision }> = ({ decision }) => (
+  <span
+    className={`flex w-full items-center justify-center rounded-full border px-2.5 py-1 text-center text-xs font-semibold ${DECISION_STYLES[decision]}`}
+  >
+    {decision}
+  </span>
+);
 
 export const ApprovalsTable: React.FC<{
   approvals: Approval[];
@@ -19,18 +26,37 @@ export const ApprovalsTable: React.FC<{
   onOpenConversation: (approval: Approval) => void;
   onReopen?: (approval: Approval) => void;
   onRequestClose?: (approval: Approval) => void;
+  onQuickDecision?: (approval: Approval, decision: CustomerDecision) => void;
   customerColumnLabel?: string;
-}> = ({ approvals, role, onOpenConversation, onReopen, onRequestClose, customerColumnLabel = 'Customer Comment' }) => {
+}> = ({
+  approvals,
+  role,
+  onOpenConversation,
+  onReopen,
+  onRequestClose,
+  onQuickDecision,
+  customerColumnLabel = 'Customer Comment',
+}) => {
   const [statusOpenId, setStatusOpenId] = React.useState<string | null>(null);
   const statusRef = React.useRef<HTMLDivElement>(null);
+  const [decisionOpenId, setDecisionOpenId] = React.useState<string | null>(null);
+  const [pendingDecision, setPendingDecision] = React.useState<CustomerDecision | null>(null);
+  const decisionRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     function handler(e: MouseEvent) {
       if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpenId(null);
+      if (decisionRef.current && !decisionRef.current.contains(e.target as Node)) setDecisionOpenId(null);
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  function toggleDecisionOpen(a: Approval) {
+    const next = decisionOpenId === a.id ? null : a.id;
+    setDecisionOpenId(next);
+    setPendingDecision(next ? a.customerDecision ?? null : null);
+  }
 
   if (approvals.length === 0) {
     return (
@@ -140,43 +166,87 @@ export const ApprovalsTable: React.FC<{
 
                 <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
 
-                <td
-                  onClick={approvalReqClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${approvalReqClickable ? 'cursor-pointer' : ''} ${
-                    approvalReqClickable && !a.customerDecision ? 'bg-amber-50/60' : ''
-                  } ${approvalReqClickable && a.customerDecision ? 'hover:bg-navy-50/30' : ''}`}
-                >
-                  <div>
-                    {a.customerDecision ? (
-                      <span
-                        title={approvalReqClickable ? 'Click to view conversation and change your response' : undefined}
-                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${DECISION_STYLES[a.customerDecision]}`}
-                      >
-                        {a.customerDecision}
-                      </span>
-                    ) : role === 'customer' ? (
-                      <span className="text-sm font-medium text-amber-700">Click to respond</span>
-                    ) : (
-                      <span className="text-xs italic text-slate/60">Awaiting decision</span>
-                    )}
-                    <div className="mt-1 text-[11px] font-medium text-slate">{formatDateTime(approvalRequestUpdatedAt(a))}</div>
-                  </div>
+                <td className="relative px-3 py-3 align-top">
+                  {approvalReqClickable ? (
+                    <div ref={decisionOpenId === a.id ? decisionRef : undefined} className="relative">
+                      <button onClick={() => toggleDecisionOpen(a)} className="flex w-full items-center gap-1">
+                        {a.customerDecision ? (
+                          <DecisionPill decision={a.customerDecision} />
+                        ) : (
+                          <span className="text-sm font-medium text-amber-700">Click to respond</span>
+                        )}
+                        <ChevronDown size={12} className="shrink-0 text-slate" />
+                      </button>
+                      <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+
+                      {decisionOpenId === a.id && (
+                        <div className="absolute left-0 top-full z-30 mt-1 w-48 rounded-lg border border-line bg-white p-2 shadow-pop">
+                          <div className="space-y-1">
+                            {CUSTOMER_DECISIONS.map((d) => (
+                              <button
+                                key={d}
+                                type="button"
+                                onClick={() => setPendingDecision(d)}
+                                className={`block w-full rounded-md border px-2.5 py-1.5 text-left text-xs font-semibold transition ${
+                                  pendingDecision === d ? DECISION_STYLES[d] : 'border-line text-slate hover:bg-surface'
+                                }`}
+                              >
+                                {CUSTOMER_DECISION_LABELS[d]}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="mt-2 flex items-center gap-1.5 border-t border-line pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDecisionOpenId(null);
+                                onOpenConversation(a);
+                              }}
+                              className="flex-1 rounded-md border border-line px-2 py-1.5 text-[11px] font-semibold text-slate hover:bg-surface"
+                            >
+                              Add Comment
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!pendingDecision}
+                              onClick={() => {
+                                if (!pendingDecision) return;
+                                onQuickDecision?.(a, pendingDecision);
+                                setDecisionOpenId(null);
+                              }}
+                              className="flex-1 rounded-md bg-navy px-2 py-1.5 text-[11px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Send
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {a.customerDecision ? (
+                        <DecisionPill decision={a.customerDecision} />
+                      ) : (
+                        <span className="text-xs italic text-slate/60">Awaiting decision</span>
+                      )}
+                      <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+                    </div>
+                  )}
                 </td>
 
                 <td
                   onClick={customerColClickable ? () => onOpenConversation(a) : undefined}
-                  className={`px-3 py-3 align-top ${customerColClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''} ${
-                    customerColClickable && !customerMsg ? 'bg-amber-50/60' : ''
-                  }`}
+                  className={`px-3 py-3 align-top ${customerColClickable ? 'cursor-pointer hover:bg-navy-50/30' : ''}`}
                 >
                   {customerMsg ? (
                     <MessagePreview message={customerMsg} openable={customerColClickable} />
                   ) : customerColClickable ? (
-                    <span className="text-sm font-medium text-amber-700">Click to add comment</span>
-                  ) : a.customerDecision ? (
-                    <span className="text-sm italic text-slate/60">No comment</span>
+                    <span className="inline-flex items-center gap-1.5 text-sm italic text-slate/60">
+                      <MessageSquare size={13} className="text-slate/40" />
+                      No comment
+                    </span>
                   ) : (
-                    <span className="text-sm italic text-slate/60">Awaiting customer comment</span>
+                    <span className="text-sm italic text-slate/60">No comment</span>
                   )}
                 </td>
 

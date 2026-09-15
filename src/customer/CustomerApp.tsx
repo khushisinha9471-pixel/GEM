@@ -8,10 +8,10 @@ import { ApprovalsTable } from '../components/ApprovalsTable';
 import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
 import { searchableText, serialNumberOf, isOverdue, pendingApprovalValue } from '../utils/approvalHelpers';
-import type { Approval, ApprovalStatus } from '../types';
+import type { Approval, ApprovalStatus, CustomerDecision } from '../types';
 
 const CustomerAppShell: React.FC = () => {
-  const { state } = useCustomerStore();
+  const { state, dispatch } = useCustomerStore();
   const [search, setSearch] = React.useState('');
   const [filters, setFilters] = React.useState<CustomerFilters>(DEFAULT_CUSTOMER_FILTERS);
   const [statusCard, setStatusCard] = React.useState<ApprovalStatus | 'All'>('All');
@@ -35,6 +35,10 @@ const CustomerAppShell: React.FC = () => {
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
   const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
+
+  function handleQuickDecision(a: Approval, decision: CustomerDecision) {
+    dispatch({ type: 'ADD_CUSTOMER_DECISION', approvalId: a.id, decision, comment: '', attachments: [] });
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface">
@@ -74,6 +78,7 @@ const CustomerAppShell: React.FC = () => {
             approvals={filtered}
             role="customer"
             onOpenConversation={(a: Approval) => setSelectedApprovalId(a.id)}
+            onQuickDecision={handleQuickDecision}
             customerColumnLabel="Your Comment"
           />
         </div>

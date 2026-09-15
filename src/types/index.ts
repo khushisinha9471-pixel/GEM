@@ -16,7 +16,7 @@ export type FinalOutcome =
   | 'Acknowledged'
   | 'Payment Timing Confirmed';
 
-export type CustomerDecision = 'Approved' | 'Approved with Condition' | 'Rejected' | 'Clarification Requested' | 'Negotiation Requested';
+export type CustomerDecision = 'Approved' | 'Rejected' | 'Clarification Requested';
 
 export const APPROVAL_TYPES: ApprovalType[] = ['O&A', 'Purchase', 'Engineering Request', 'Invoice Acknowledgement'];
 
@@ -35,13 +35,16 @@ export const FINAL_OUTCOMES: FinalOutcome[] = [
   'Payment Timing Confirmed',
 ];
 
-export const CUSTOMER_DECISIONS: CustomerDecision[] = [
-  'Approved',
-  'Approved with Condition',
-  'Rejected',
-  'Clarification Requested',
-  'Negotiation Requested',
-];
+export const CUSTOMER_DECISIONS: CustomerDecision[] = ['Approved', 'Rejected', 'Clarification Requested'];
+
+// The customer picks a decision by the action they're taking ("Request
+// Clarification"); everywhere else (table pills, conversation badges) shows
+// the resulting state ("Clarification Requested").
+export const CUSTOMER_DECISION_LABELS: Record<CustomerDecision, string> = {
+  Approved: 'Approved',
+  Rejected: 'Rejected',
+  'Clarification Requested': 'Request Clarification',
+};
 
 export interface Attachment {
   id: string;
