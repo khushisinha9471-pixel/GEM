@@ -135,10 +135,12 @@ export const ApprovalsTable: React.FC<{
                   ) : (
                     <span
                       title={a.status}
-                      className={`mx-auto mt-1 block h-2.5 w-2.5 rounded-full ${
-                        a.status === 'Open' ? 'bg-amber-500' : 'bg-emerald-500'
+                      className={`mx-auto mt-1 flex h-4 w-4 items-center justify-center rounded-full ${
+                        a.status === 'Open' ? 'bg-amber-100' : 'bg-emerald-100'
                       }`}
-                    />
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${a.status === 'Open' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                    </span>
                   )}
                 </td>
 
