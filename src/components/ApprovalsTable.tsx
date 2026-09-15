@@ -94,7 +94,7 @@ export const ApprovalsTable: React.FC<{
               <tr key={a.id} className="border-b border-line last:border-0">
                 <td className="px-2 py-3 align-top text-right text-xs text-slate">{idx + 1}</td>
 
-                <td className={`relative px-2 py-3 align-top ${isCustomer ? 'text-center' : ''}`}>
+                <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
                     <div ref={statusOpenId === a.id ? statusRef : undefined} className="relative">
                       <button
@@ -135,7 +135,7 @@ export const ApprovalsTable: React.FC<{
                   ) : (
                     <span
                       title={a.status}
-                      className={`mx-auto mt-1 flex h-4 w-4 items-center justify-center rounded-full ${
+                      className={`mt-1 flex h-4 w-4 items-center justify-center rounded-full ${
                         a.status === 'Open' ? 'bg-amber-100' : 'bg-emerald-100'
                       }`}
                     >
