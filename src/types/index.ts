@@ -122,7 +122,6 @@ export interface Approval {
   outcome: FinalOutcome | null;
   closedAt?: string;
   customerDecision: CustomerDecision | null;
-  responseDueAt?: string | null; // ISO — when the customer's response is expected by
 }
 
 export interface Customer {

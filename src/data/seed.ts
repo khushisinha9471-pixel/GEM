@@ -99,7 +99,6 @@ interface Draft {
   outcome?: Approval['outcome'];
   closedAt?: string;
   customerDecision?: Approval['customerDecision'];
-  responseDueAt?: Approval['responseDueAt'];
 }
 
 function build(d: Draft): Approval {
@@ -124,7 +123,6 @@ function build(d: Draft): Approval {
     outcome: d.outcome ?? null,
     closedAt: d.closedAt,
     customerDecision: d.customerDecision ?? null,
-    responseDueAt: d.responseDueAt ?? null,
   };
 }
 
@@ -243,18 +241,17 @@ export const INITIAL_APPROVALS: Approval[] = [
     requirement: 'The LPT nozzle is damaged and cannot be repaired. It needs to be exchanged for a working unit.',
     cost: 18400,
     status: 'Open',
-    createdAt: '2026-09-06T09:20:00+05:30',
+    createdAt: '2026-08-27T09:20:00+05:30',
     messages: [
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
         body: 'Please review the proposed exchange and let us know if you approve.',
-        date: '2026-09-06T09:40:00+05:30',
+        date: '2026-08-27T09:40:00+05:30',
         attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-06', { reportType: 'Inspection' })],
       }),
     ],
-    responseDueAt: '2026-09-08T17:00:00+05:30',
   }),
 
   // APP-004 — open, Price Deviation, awaiting customer decision
@@ -278,7 +275,6 @@ export const INITIAL_APPROVALS: Approval[] = [
         attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
       }),
     ],
-    responseDueAt: '2026-09-09T17:00:00+05:30',
   }),
 
   // APP-005 — open, Additional Repair, customer rejected (CSM still to follow up)
@@ -415,18 +411,17 @@ export const INITIAL_APPROVALS: Approval[] = [
     requirement: 'The LPT blade needs extra repair beyond the original scope, based on the inspection findings. We need your approval before we can proceed.',
     cost: 5400,
     status: 'Open',
-    createdAt: '2026-09-09T09:00:00+05:30',
+    createdAt: '2026-08-29T09:00:00+05:30',
     messages: [
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
         body: 'Please review the attached inspection findings and confirm whether the additional repair may proceed.',
-        date: '2026-09-09T09:20:00+05:30',
+        date: '2026-08-29T09:20:00+05:30',
         attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-08', { reportType: 'Inspection' })],
       }),
     ],
-    responseDueAt: '2026-09-13T17:00:00+05:30',
   }),
 
   // APP-010 — open, LLP Purchase, awaiting customer decision
@@ -450,7 +445,6 @@ export const INITIAL_APPROVALS: Approval[] = [
         attachments: [att('LLP Records Package.pdf', 'reports-library', '2026-09-07', { reportType: 'Records' })],
       }),
     ],
-    responseDueAt: '2026-09-14T17:00:00+05:30',
   }),
 
   // APP-011 — closed, Customer Provided Part, Approved

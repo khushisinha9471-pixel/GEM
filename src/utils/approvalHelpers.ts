@@ -56,10 +56,13 @@ export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: 
   return idxBase >= 0 ? idxBase + 1 : null;
 }
 
-// Still awaiting a customer decision and past its expected response date
+const OVERDUE_THRESHOLD_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
+
+// Still awaiting a customer decision and has been open for more than 10 days
 // (relative to the fixed demo "now", not the viewer's real clock).
 export function isOverdue(a: Approval): boolean {
-  return a.status === 'Open' && !a.customerDecision && !!a.responseDueAt && a.responseDueAt < DEMO_NOW;
+  if (a.status !== 'Open' || a.customerDecision) return false;
+  return new Date(DEMO_NOW).getTime() - new Date(a.createdAt).getTime() > OVERDUE_THRESHOLD_MS;
 }
 
 // Total cost across approvals still awaiting a customer decision.
