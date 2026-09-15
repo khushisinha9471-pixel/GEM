@@ -33,7 +33,6 @@ type Action =
   | { type: 'ADD_CUSTOMER_DECISION'; approvalId: string; decision: CustomerDecision; comment: string; attachments: Attachment[] }
   | { type: 'FORWARD_TO_INTERNAL'; approvalId: string; forwardRequest: InternalForwardRequest }
   | { type: 'SIMULATE_MAILBOX_REPLY'; approvalId: string; forwardRequestId: string; body: string }
-  | { type: 'NOTIFY_CUSTOMER'; approvalId: string; customerIds: string[] | 'all'; message: string }
   | { type: 'UPDATE_ACCESS'; approvalId: string; access: 'all' | 'selected'; selectedCustomerIds: string[] }
   | { type: 'REQUEST_CLOSE'; approvalId: string; outcome?: FinalOutcome }
   | { type: 'REOPEN_APPROVAL'; approvalId: string }
@@ -218,26 +217,6 @@ function reducer(state: State, action: Action): State {
           ...state.toasts,
           { id: genId('toast'), title: 'Internal response captured from email', body: `${responderName} replied on ${action.approvalId}`, tone: 'success' },
         ],
-      };
-    }
-    case 'NOTIFY_CUSTOMER': {
-      const approvals = updateApproval(state, action.approvalId, (a) => ({
-        ...a,
-        audit: [
-          ...a.audit,
-          {
-            id: genId('audit'),
-            date: nowIso(),
-            actor: 'Harini V (CSM)',
-            action: 'Customer notification sent',
-            detail: `Notified ${action.customerIds === 'all' ? 'all mapped customers' : `${action.customerIds.length} selected customer(s)`}: "${action.message}"`,
-          },
-        ],
-      }));
-      return {
-        ...state,
-        approvals,
-        toasts: [...state.toasts, { id: genId('toast'), title: 'Notification sent to customer', body: action.approvalId, tone: 'success' }],
       };
     }
     case 'UPDATE_ACCESS': {

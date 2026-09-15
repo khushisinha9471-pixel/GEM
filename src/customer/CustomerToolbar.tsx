@@ -34,8 +34,8 @@ export const CustomerToolbar: React.FC<{
   ).length;
 
   return (
-    <div className="flex flex-1 flex-wrap items-center gap-3">
-      <div className="flex min-w-[240px] flex-1 max-w-md items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 shadow-card">
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      <div className="flex w-64 items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 shadow-card">
         <Search size={16} className="text-slate" />
         <input
           value={search}
@@ -66,7 +66,7 @@ export const CustomerToolbar: React.FC<{
           )}
         </button>
         {open && (
-          <div className="absolute left-0 top-11 z-40 w-80 rounded-xl border border-line bg-white p-4 shadow-pop">
+          <div className="absolute right-0 top-11 z-40 w-80 rounded-xl border border-line bg-white p-4 shadow-pop">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-navy">Filters</span>
               <button className="text-xs font-medium text-slate hover:text-navy" onClick={() => onFilters(DEFAULT_CUSTOMER_FILTERS)}>

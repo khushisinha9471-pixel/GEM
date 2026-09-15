@@ -1,4 +1,5 @@
 import type { Approval, ConversationMessage } from '../types';
+import { DEMO_NOW } from '../data/seed';
 
 export function latestCsmResponse(a: Approval): ConversationMessage | null {
   const msgs = a.messages.filter((m) => m.channel === 'customer' && m.authorRole === 'CSM');
@@ -53,6 +54,17 @@ export function serialNumberOf(approvals: Approval[], filtered: Approval[], id: 
   const base = [...approvals].sort((a, b) => b.seq - a.seq);
   const idxBase = base.findIndex((a) => a.id === id);
   return idxBase >= 0 ? idxBase + 1 : null;
+}
+
+// Still awaiting a customer decision and past its expected response date
+// (relative to the fixed demo "now", not the viewer's real clock).
+export function isOverdue(a: Approval): boolean {
+  return a.status === 'Open' && !a.customerDecision && !!a.responseDueAt && a.responseDueAt < DEMO_NOW;
+}
+
+// Total cost across approvals still awaiting a customer decision.
+export function pendingApprovalValue(approvals: Approval[]): number {
+  return approvals.filter((a) => a.status === 'Open' && !a.customerDecision).reduce((sum, a) => sum + (a.cost ?? 0), 0);
 }
 
 export function searchableText(a: Approval): string {

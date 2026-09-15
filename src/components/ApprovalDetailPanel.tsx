@@ -39,9 +39,8 @@ export const ApprovalDetailPanel: React.FC<{
   approval: Approval;
   serial: number;
   onClose: () => void;
-  onNotify: (approvalId: string) => void;
   onRequestClose: (approvalId: string) => void;
-}> = ({ approval, serial, onClose, onNotify, onRequestClose }) => {
+}> = ({ approval, serial, onClose, onRequestClose }) => {
   const { dispatch } = useStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
   const [accessOpen, setAccessOpen] = React.useState(false);
@@ -112,10 +111,6 @@ export const ApprovalDetailPanel: React.FC<{
             <button onClick={() => setAccessOpen(true)} className="btn-secondary">
               <ShieldCheck size={14} />
               Access: {accessLabel.length > 28 ? `${accessLabel.slice(0, 28)}…` : accessLabel}
-            </button>
-            <button onClick={() => onNotify(approval.id)} className="btn-secondary">
-              <Send size={14} />
-              Notify Customer
             </button>
             {approval.status === 'Open' ? (
               <button onClick={() => onRequestClose(approval.id)} className="btn-primary">

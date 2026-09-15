@@ -14,6 +14,12 @@ export const WORK_ORDER = {
   esn: '897300',
 };
 
+// Fixed "as of" reference time for this demo dataset (matches the "Data as
+// of" text in the CSM header) — used instead of the real browser clock so
+// overdue/pending calculations stay deterministic regardless of when the
+// artifact is actually viewed.
+export const DEMO_NOW = '2026-09-10T21:43:15+05:30';
+
 export const CUSTOMERS: Customer[] = [
   { id: 'cust-a', name: 'Sarah Mitchell' },
   { id: 'cust-b', name: 'David Chen' },
@@ -93,6 +99,7 @@ interface Draft {
   outcome?: Approval['outcome'];
   closedAt?: string;
   customerDecision?: Approval['customerDecision'];
+  responseDueAt?: Approval['responseDueAt'];
 }
 
 function build(d: Draft): Approval {
@@ -117,6 +124,7 @@ function build(d: Draft): Approval {
     outcome: d.outcome ?? null,
     closedAt: d.closedAt,
     customerDecision: d.customerDecision ?? null,
+    responseDueAt: d.responseDueAt ?? null,
   };
 }
 
@@ -246,6 +254,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-06', { reportType: 'Inspection' })],
       }),
     ],
+    responseDueAt: '2026-09-08T17:00:00+05:30',
   }),
 
   // APP-004 — open, Price Deviation, awaiting customer decision
@@ -269,6 +278,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
       }),
     ],
+    responseDueAt: '2026-09-09T17:00:00+05:30',
   }),
 
   // APP-005 — open, Additional Repair, customer rejected (CSM still to follow up)
@@ -416,6 +426,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         attachments: [att('Borescope Findings.pdf', 'reports-library', '2026-09-08', { reportType: 'Inspection' })],
       }),
     ],
+    responseDueAt: '2026-09-13T17:00:00+05:30',
   }),
 ];
 

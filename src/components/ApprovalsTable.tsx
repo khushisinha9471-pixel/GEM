@@ -66,7 +66,7 @@ export const ApprovalsTable: React.FC<{
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
             <th className="px-3 py-3 text-right">Cost</th>
-            <th className="px-3 py-3">Approval Request</th>
+            <th className="px-3 py-3">Decision</th>
             <th className="px-3 py-3">{customerColumnLabel}</th>
             <th className="px-3 py-3">GEM Comment</th>
           </tr>
