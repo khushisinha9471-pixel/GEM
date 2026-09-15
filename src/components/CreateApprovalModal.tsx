@@ -151,7 +151,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
           </div>
 
           <div>
-            <label className="field-label">Item / Part</label>
+            <label className="field-label">Part</label>
             <div className="grid grid-cols-2 gap-2">
               <input
                 value={partNumber}
@@ -179,7 +179,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               value={requirement}
               onChange={(e) => setRequirement(e.target.value)}
               rows={4}
-              placeholder="Describe what is required and why the approval is needed — e.g. HPT blade requires additional repair beyond the original approved workscope due to inspection findings."
+              placeholder="What needs approval, and why — e.g. HPT blade needs additional repair beyond the approved workscope."
               className="textarea-input"
             />
             {errors.requirement && <p className="mt-1 text-xs text-red-600">{errors.requirement}</p>}
@@ -217,7 +217,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               value={csmResponse}
               onChange={(e) => setCsmResponse(e.target.value)}
               rows={3}
-              placeholder="Please review the additional repair requirement and confirm whether the repair may proceed."
+              placeholder="Your message to the customer — e.g. Please review and confirm whether the repair may proceed."
               className="textarea-input"
             />
           </div>
