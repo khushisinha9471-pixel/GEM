@@ -63,7 +63,6 @@ export const ForwardToInternalModal: React.FC<{ approval: Approval; onClose: () 
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div>
             <h2 className="text-base font-semibold text-navy">Forward to Internal Member</h2>
-            <p className="text-xs text-slate">Request input without granting Customer Portal access — sent via email.</p>
           </div>
           <button onClick={onClose} className="rounded-full p-1.5 text-slate hover:bg-surface hover:text-navy">
             <X size={18} />
