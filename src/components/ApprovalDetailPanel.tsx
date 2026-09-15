@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import type { Approval, Attachment } from '../types';
 import { StatusPill, OutcomeBadge } from './StatusPill';
-import { formatCost, formatDateTime, itemPartLabel } from '../utils/format';
+import { formatDateTime } from '../utils/format';
 import { mergedConversation } from '../utils/approvalHelpers';
 import { ConversationThread } from './ConversationThread';
 import { ApprovalAttachmentsView } from './ApprovalAttachmentsView';
@@ -91,21 +91,11 @@ export const ApprovalDetailPanel: React.FC<{
                 <StatusPill status={approval.status} />
                 {approval.outcome && <OutcomeBadge outcome={approval.outcome} />}
               </div>
-              <p className="mt-1 text-sm font-medium text-slate">
-                {approval.type}
-                {approval.subtype ? ` — ${approval.subtype}` : ''}
-              </p>
-              <p className="mt-0.5 text-sm text-navy">
-                {itemPartLabel(approval)}
-                {approval.cost != null && <span className="text-slate"> | {formatCost(approval.cost)}</span>}
-              </p>
             </div>
             <button onClick={onClose} className="rounded-full p-1.5 text-slate hover:bg-surface hover:text-navy">
               <X size={20} />
             </button>
           </div>
-
-          <p className="mt-3 rounded-lg bg-surface/60 px-3 py-2 text-sm text-navy/90">{approval.requirement}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button onClick={() => setAccessOpen(true)} className="btn-secondary">

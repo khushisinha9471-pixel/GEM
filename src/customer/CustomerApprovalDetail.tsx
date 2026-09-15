@@ -3,7 +3,6 @@ import { X, Send } from 'lucide-react';
 import type { Approval, Attachment, CustomerDecision } from '../types';
 import { CUSTOMER_DECISIONS } from '../types';
 import { StatusPill, OutcomeBadge } from '../components/StatusPill';
-import { formatCost, itemPartLabel } from '../utils/format';
 import { customerVisibleMessages } from '../utils/approvalHelpers';
 import { ConversationThread } from '../components/ConversationThread';
 import { useCustomerStore } from './customerStore';
@@ -64,21 +63,11 @@ export const CustomerApprovalDetail: React.FC<{ approval: Approval; serial: numb
                 <StatusPill status={approval.status} />
                 {approval.outcome && <OutcomeBadge outcome={approval.outcome} />}
               </div>
-              <p className="mt-1 text-sm font-medium text-slate">
-                {approval.type}
-                {approval.subtype ? ` — ${approval.subtype}` : ''}
-              </p>
-              <p className="mt-0.5 text-sm text-navy">
-                {itemPartLabel(approval)}
-                {approval.cost != null && <span className="text-slate"> | {formatCost(approval.cost)}</span>}
-              </p>
             </div>
             <button onClick={onClose} className="rounded-full p-1.5 text-slate hover:bg-surface hover:text-navy">
               <X size={20} />
             </button>
           </div>
-
-          <p className="mt-3 rounded-lg bg-surface/60 px-3 py-2 text-sm text-navy/90">{approval.requirement}</p>
         </div>
 
         {/* Tabs */}
