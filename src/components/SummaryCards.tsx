@@ -37,7 +37,10 @@ export const SummaryCards: React.FC<{
         </div>
         <div className="mt-1 text-xl font-bold text-navy">{overdueCount}</div>
       </button>
-      <div className="min-w-[150px] rounded-xl border border-line bg-white p-3 shadow-card">
+      <div
+        title="Total accumulated cost across all open approvals still awaiting a customer decision"
+        className="min-w-[150px] rounded-xl border border-line bg-white p-3 shadow-card"
+      >
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-navy" />
           <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Pending Approvals Value</span>
