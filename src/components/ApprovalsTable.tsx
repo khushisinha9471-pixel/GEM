@@ -4,7 +4,7 @@ import { CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDate, formatDateTime } from '../utils/format';
 import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
-import { ChevronDown, Maximize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
+import { ChevronDown, Maximize2, Minimize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -85,7 +85,7 @@ export const ApprovalsTable: React.FC<{
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-2 py-3">S.No.</th>
+            <th className="px-2 py-3 text-right">S.No.</th>
             <th className="px-2 py-3">Status</th>
             <th className="px-3 py-3">Type</th>
             <th className="px-3 py-3">Subtype</th>
@@ -107,7 +107,7 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="px-2 py-3 align-top text-xs text-slate">{idx + 1}</td>
+                <td className="px-2 py-3 align-top text-right text-xs text-slate">{idx + 1}</td>
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -161,7 +161,7 @@ export const ApprovalsTable: React.FC<{
                 </td>
 
                 <td className="px-3 py-3 align-top text-sm text-slate">
-                  <ExpandableText text={a.requirement} className="text-sm text-slate" />
+                  <ExpandableText text={a.requirement} className="text-sm text-slate" mode="inline" />
                 </td>
 
                 <td className="px-3 py-3 align-top text-right text-sm font-medium text-navy">{formatCost(a.cost)}</td>
@@ -273,7 +273,11 @@ export const ApprovalsTable: React.FC<{
   );
 };
 
-const ExpandableText: React.FC<{ text: string; className?: string }> = ({ text, className = 'text-sm text-slate' }) => {
+const ExpandableText: React.FC<{ text: string; className?: string; mode?: 'popover' | 'inline' }> = ({
+  text,
+  className = 'text-sm text-slate',
+  mode = 'popover',
+}) => {
   const [open, setOpen] = React.useState(false);
   const [overflowing, setOverflowing] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -294,13 +298,32 @@ const ExpandableText: React.FC<{ text: string; className?: string }> = ({ text, 
   }, [measure]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (mode !== 'popover' || !open) return;
     function handler(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  }, [open, mode]);
+
+  if (mode === 'inline') {
+    return (
+      <div
+        ref={containerRef}
+        onClick={() => overflowing && setOpen((v) => !v)}
+        className={`relative ${overflowing ? 'cursor-pointer pr-4' : ''}`}
+      >
+        <p ref={textRef} className={`${open ? '' : 'line-clamp-2'} ${className}`}>
+          {text}
+        </p>
+        {overflowing && (
+          <span title={open ? 'Click to collapse' : 'Click to view full text'} className="absolute -top-0.5 right-0 rounded p-0.5 text-slate/40">
+            {open ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={`relative ${overflowing ? 'pr-4' : ''}`}>
