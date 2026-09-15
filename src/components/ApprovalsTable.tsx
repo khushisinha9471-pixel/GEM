@@ -1,10 +1,10 @@
 import React from 'react';
-import type { Approval, ApprovalType, CustomerDecision } from '../types';
-import { APPROVAL_TYPES, CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
+import type { Approval, CustomerDecision } from '../types';
+import { CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDate, formatDateTime } from '../utils/format';
 import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
-import { ChevronDown, Maximize2, Minimize2, FileQuestion, Paperclip, Mail, MessageSquare, Layers, Rows3 } from 'lucide-react';
+import { ChevronDown, Maximize2, Minimize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
   Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -42,17 +42,6 @@ export const ApprovalsTable: React.FC<{
   const [decisionOpenId, setDecisionOpenId] = React.useState<string | null>(null);
   const [pendingDecision, setPendingDecision] = React.useState<CustomerDecision | null>(null);
   const decisionRef = React.useRef<HTMLDivElement>(null);
-  const [groupByType, setGroupByType] = React.useState(false);
-  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<ApprovalType>>(new Set());
-
-  function toggleGroupCollapsed(t: ApprovalType) {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(t)) next.delete(t);
-      else next.add(t);
-      return next;
-    });
-  }
 
   React.useEffect(() => {
     function handler(e: MouseEvent) {
@@ -79,15 +68,38 @@ export const ApprovalsTable: React.FC<{
     );
   }
 
-  const groups = groupByType
-    ? APPROVAL_TYPES.map((t) => ({
-        type: t,
-        rows: approvals.map((a, idx) => ({ a, idx })).filter(({ a }) => a.type === t),
-      })).filter((g) => g.rows.length > 0)
-    : null;
-
-  function renderRow(a: Approval, idx: number) {
-    const gemMsg = latestCsmResponse(a);
+  return (
+    <div className="card overflow-x-auto">
+      <table className="w-full min-w-[1080px] table-fixed border-collapse text-left">
+        <colgroup>
+          <col className="w-[40px]" />
+          <col className="w-[96px]" />
+          <col className="w-[104px]" />
+          <col className="w-[96px]" />
+          <col className="w-[124px]" />
+          <col className="w-[280px]" />
+          <col className="w-[74px]" />
+          <col className="w-[116px]" />
+          <col className="w-[210px]" />
+          <col className="w-[210px]" />
+        </colgroup>
+        <thead>
+          <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
+            <th className="px-2 py-3 text-right">S.No.</th>
+            <th className="px-2 py-3">Status</th>
+            <th className="px-3 py-3">Type</th>
+            <th className="px-3 py-3">Subtype</th>
+            <th className="px-3 py-3">Part</th>
+            <th className="px-3 py-3">Requirement</th>
+            <th className="px-3 py-3 text-right">Cost</th>
+            <th className="px-3 py-3">Decision</th>
+            <th className="px-3 py-3">{customerColumnLabel}</th>
+            <th className="px-3 py-3">GEM Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {approvals.map((a, idx) => {
+            const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
             const customerColClickable = role === 'customer';
@@ -253,74 +265,8 @@ export const ApprovalsTable: React.FC<{
                   )}
                 </td>
               </tr>
-    );
-  }
-
-  return (
-    <div className="card overflow-x-auto">
-      <div className="flex items-center justify-end border-b border-line px-3 py-2">
-        <button
-          onClick={() => setGroupByType((v) => !v)}
-          className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
-            groupByType ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate hover:bg-surface'
-          }`}
-        >
-          {groupByType ? <Rows3 size={14} /> : <Layers size={14} />}
-          {groupByType ? 'Flat View' : 'Group by Type'}
-        </button>
-      </div>
-      <table className="w-full min-w-[1080px] table-fixed border-collapse text-left">
-        <colgroup>
-          <col className="w-[40px]" />
-          <col className="w-[96px]" />
-          <col className="w-[104px]" />
-          <col className="w-[96px]" />
-          <col className="w-[124px]" />
-          <col className="w-[280px]" />
-          <col className="w-[74px]" />
-          <col className="w-[116px]" />
-          <col className="w-[210px]" />
-          <col className="w-[210px]" />
-        </colgroup>
-        <thead>
-          <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-2 py-3 text-right">S.No.</th>
-            <th className="px-2 py-3">Status</th>
-            <th className="px-3 py-3">Type</th>
-            <th className="px-3 py-3">Subtype</th>
-            <th className="px-3 py-3">Part</th>
-            <th className="px-3 py-3">Requirement</th>
-            <th className="px-3 py-3 text-right">Cost</th>
-            <th className="px-3 py-3">Decision</th>
-            <th className="px-3 py-3">{customerColumnLabel}</th>
-            <th className="px-3 py-3">GEM Comment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groups
-            ? groups.map((g) => (
-                <React.Fragment key={g.type}>
-                  <tr className="border-b border-line bg-surface/70">
-                    <td colSpan={10} className="px-3 py-2">
-                      <button
-                        onClick={() => toggleGroupCollapsed(g.type)}
-                        className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-navy"
-                      >
-                        <ChevronDown
-                          size={14}
-                          className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
-                        />
-                        {g.type}
-                        <span className="rounded-full bg-navy-50 px-2 py-0.5 text-[11px] font-semibold text-navy">
-                          {g.rows.length}
-                        </span>
-                      </button>
-                    </td>
-                  </tr>
-                  {!collapsedGroups.has(g.type) && g.rows.map(({ a, idx }) => renderRow(a, idx))}
-                </React.Fragment>
-              ))
-            : approvals.map((a, idx) => renderRow(a, idx))}
+            );
+          })}
         </tbody>
       </table>
     </div>
