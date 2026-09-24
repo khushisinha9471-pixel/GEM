@@ -47,7 +47,7 @@ export const AttachmentManager: React.FC<{
   return (
     <div>
       <label className="field-label">{label}</label>
-      <div className="group">
+      <div className="group relative inline-block">
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setPickerOpen(true)} className="btn-secondary">
             <Link2 size={14} />
@@ -80,7 +80,7 @@ export const AttachmentManager: React.FC<{
             setDragOver(false);
             addExternalFiles(e.dataTransfer.files);
           }}
-          className={`mt-2 hidden rounded-lg border border-dashed px-3 py-3 text-center text-xs transition group-hover:block ${
+          className={`absolute left-0 top-full z-20 mt-2 hidden w-72 rounded-lg border border-dashed bg-white px-3 py-3 text-center text-xs shadow-pop transition group-hover:block ${
             dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
           }`}
         >

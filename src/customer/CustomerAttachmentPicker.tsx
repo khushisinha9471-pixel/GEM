@@ -27,38 +27,40 @@ export const CustomerAttachmentPicker: React.FC<{
   }
 
   return (
-    <div className="group">
-      <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
-        <Upload size={14} />
-        Add Attachment
-      </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          addFiles(e.target.files);
-          e.target.value = '';
-        }}
-      />
+    <div>
+      <div className="group relative inline-block">
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
+          <Upload size={14} />
+          Add Attachment
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            addFiles(e.target.files);
+            e.target.value = '';
+          }}
+        />
 
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          addFiles(e.dataTransfer.files);
-        }}
-        className={`mt-2 hidden rounded-lg border border-dashed px-3 py-3 text-center text-xs transition group-hover:block ${
-          dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
-        }`}
-      >
-        Drag and drop a file here, or use the button above
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            addFiles(e.dataTransfer.files);
+          }}
+          className={`absolute left-0 top-full z-20 mt-2 hidden w-64 rounded-lg border border-dashed bg-white px-3 py-3 text-center text-xs shadow-pop transition group-hover:block ${
+            dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
+          }`}
+        >
+          Drag and drop a file here, or use the button above
+        </div>
       </div>
 
       {attachments.length > 0 && (
