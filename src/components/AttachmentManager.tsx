@@ -10,7 +10,6 @@ export const AttachmentManager: React.FC<{
   label?: string;
 }> = ({ attachments, onChange, label = 'Attachments' }) => {
   const [pickerOpen, setPickerOpen] = React.useState(false);
-  const [dragOver, setDragOver] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   function addExternalFiles(files: FileList | null) {
@@ -47,45 +46,25 @@ export const AttachmentManager: React.FC<{
   return (
     <div>
       <label className="field-label">{label}</label>
-      <div className="group relative inline-block">
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setPickerOpen(true)} className="btn-secondary">
-            <Link2 size={14} />
-            Link from Reports Library
-          </button>
-          <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
-            <Upload size={14} />
-            Add External Attachment
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              addExternalFiles(e.target.files);
-              e.target.value = '';
-            }}
-          />
-        </div>
-
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => setPickerOpen(true)} className="btn-secondary">
+          <Link2 size={14} />
+          Link from Reports Library
+        </button>
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
+          <Upload size={14} />
+          Add External Attachment
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            addExternalFiles(e.target.files);
+            e.target.value = '';
           }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-            addExternalFiles(e.dataTransfer.files);
-          }}
-          className={`absolute left-0 top-full z-20 mt-2 hidden w-72 rounded-lg border border-dashed bg-white px-3 py-3 text-center text-xs shadow-pop transition group-hover:block ${
-            dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
-          }`}
-        >
-          Drag and drop files here, or use the buttons above
-        </div>
+        />
       </div>
 
       {attachments.length > 0 && (

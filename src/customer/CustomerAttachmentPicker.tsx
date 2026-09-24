@@ -7,7 +7,6 @@ export const CustomerAttachmentPicker: React.FC<{
   attachments: Attachment[];
   onChange: (attachments: Attachment[]) => void;
 }> = ({ attachments, onChange }) => {
-  const [dragOver, setDragOver] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   function addFiles(files: FileList | null) {
@@ -28,40 +27,20 @@ export const CustomerAttachmentPicker: React.FC<{
 
   return (
     <div>
-      <div className="group relative inline-block">
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
-          <Upload size={14} />
-          Add Attachment
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            addFiles(e.target.files);
-            e.target.value = '';
-          }}
-        />
-
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-            addFiles(e.dataTransfer.files);
-          }}
-          className={`absolute left-0 top-full z-20 mt-2 hidden w-64 rounded-lg border border-dashed bg-white px-3 py-3 text-center text-xs shadow-pop transition group-hover:block ${
-            dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
-          }`}
-        >
-          Drag and drop a file here, or use the button above
-        </div>
-      </div>
+      <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
+        <Upload size={14} />
+        Add Attachment
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          addFiles(e.target.files);
+          e.target.value = '';
+        }}
+      />
 
       {attachments.length > 0 && (
         <ul className="mt-2 space-y-1.5">
