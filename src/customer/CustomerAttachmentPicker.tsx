@@ -27,7 +27,7 @@ export const CustomerAttachmentPicker: React.FC<{
   }
 
   return (
-    <div>
+    <div className="group">
       <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
         <Upload size={14} />
         Add Attachment
@@ -54,7 +54,7 @@ export const CustomerAttachmentPicker: React.FC<{
           setDragOver(false);
           addFiles(e.dataTransfer.files);
         }}
-        className={`mt-2 rounded-lg border border-dashed px-3 py-3 text-center text-xs transition ${
+        className={`mt-2 hidden rounded-lg border border-dashed px-3 py-3 text-center text-xs transition group-hover:block ${
           dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
         }`}
       >
