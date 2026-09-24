@@ -99,7 +99,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 
   return (
     <div className="modal-overlay">
-      <div className="flex h-full w-full max-w-xl flex-col overflow-hidden bg-white shadow-pop">
+      <div className="flex h-full w-full max-w-5xl flex-col overflow-hidden bg-white shadow-pop">
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold text-navy">Create Approval</h2>
