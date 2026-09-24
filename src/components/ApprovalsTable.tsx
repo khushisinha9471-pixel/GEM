@@ -4,6 +4,7 @@ import { APPROVAL_TYPES, CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '..
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDate, formatDateTime } from '../utils/format';
 import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
+import { WORK_ORDERS } from '../data/seed';
 import { ChevronDown, Maximize2, Minimize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
 
 const DECISION_STYLES: Record<CustomerDecision, string> = {
@@ -89,10 +90,18 @@ export const ApprovalsTable: React.FC<{
             const gemClickable = role === 'csm';
             const customerColClickable = role === 'customer';
             const approvalReqClickable = role === 'customer';
+            const workOrder = WORK_ORDERS.find((wo) => wo.id === a.workOrderId);
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
                 <td className="px-2 py-3 align-top text-right text-xs text-slate">{rowNumber}</td>
+
+                {role === 'csm' && (
+                  <td className="break-words px-3 py-3 align-top text-sm text-navy">
+                    {a.workOrderId}
+                    {workOrder && <div className="mt-0.5 text-[11px] font-medium text-slate">{workOrder.engineModel}</div>}
+                  </td>
+                )}
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -266,18 +275,20 @@ export const ApprovalsTable: React.FC<{
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
           <col className="w-[40px]" />
+          {!isCustomer && <col className="w-[92px]" />}
           <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
-          <col className="w-[100px]" />
-          <col className="w-[108px]" />
-          <col className={isCustomer ? 'w-[257px]' : 'w-[236px]'} />
-          <col className="w-[74px]" />
-          <col className="w-[112px]" />
-          <col className={isCustomer ? 'w-[241px]' : 'w-[220px]'} />
-          <col className={isCustomer ? 'w-[240px]' : 'w-[220px]'} />
+          <col className={isCustomer ? 'w-[100px]' : 'w-[92px]'} />
+          <col className={isCustomer ? 'w-[108px]' : 'w-[100px]'} />
+          <col className={isCustomer ? 'w-[257px]' : 'w-[200px]'} />
+          <col className={isCustomer ? 'w-[74px]' : 'w-[70px]'} />
+          <col className={isCustomer ? 'w-[112px]' : 'w-[106px]'} />
+          <col className={isCustomer ? 'w-[241px]' : 'w-[205px]'} />
+          <col className={isCustomer ? 'w-[240px]' : 'w-[205px]'} />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
             <th className="px-2 py-3 text-right">S.No.</th>
+            {!isCustomer && <th className="px-3 py-3">Work Order</th>}
             <th className="px-2 py-3">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
@@ -294,7 +305,7 @@ export const ApprovalsTable: React.FC<{
             return groups.map((g) => (
               <React.Fragment key={g.type}>
                 <tr className="border-b border-line bg-surface/70">
-                  <td colSpan={9} className="px-3 py-3">
+                  <td colSpan={isCustomer ? 9 : 10} className="px-3 py-3">
                     <button
                       onClick={() => toggleGroupCollapsed(g.type)}
                       className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"

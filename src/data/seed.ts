@@ -6,6 +6,7 @@ import type {
   InternalMember,
   ReportLibraryItem,
   ConversationMessage,
+  WorkOrder,
 } from '../types';
 
 export const WORK_ORDER = {
@@ -13,6 +14,15 @@ export const WORK_ORDER = {
   engineModel: 'CFM56-7B',
   esn: '897300',
 };
+
+// The CSM screen works across every active work order in one place, unlike
+// the customer portal, which stays scoped to WORK_ORDER above (the one work
+// order that customer account can see).
+export const WORK_ORDERS: WorkOrder[] = [
+  { id: 'WO-2026-00125', engineModel: 'CFM56-7B', esn: '897300' },
+  { id: 'WO-2026-00089', engineModel: 'CFM56-5B', esn: '812455' },
+  { id: 'WO-2026-00142', engineModel: 'CF34-8E', esn: '705522' },
+];
 
 // Fixed "as of" reference time for this demo dataset (matches the "Data as
 // of" text in the CSM header) — used instead of the real browser clock so
@@ -73,6 +83,7 @@ function baseAudit(id: string, createdAt: string, type: string, subtype: string 
 
 interface Draft {
   seq: number;
+  workOrderId?: string;
   type: Approval['type'];
   subtype: Approval['subtype'];
   partNumber?: string;
@@ -97,6 +108,7 @@ function build(d: Draft): Approval {
   return {
     id,
     seq: d.seq,
+    workOrderId: d.workOrderId ?? WORK_ORDERS[0].id,
     type: d.type,
     subtype: d.subtype,
     partNumber: d.partNumber,
@@ -206,6 +218,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-003 — open, Exchange, awaiting customer decision
   build({
     seq: 3,
+    workOrderId: 'WO-2026-00089',
     type: 'O&A',
     subtype: 'Exchange',
     partNumber: '552341',
@@ -229,6 +242,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-004 — open, Price Deviation, awaiting customer decision
   build({
     seq: 4,
+    workOrderId: 'WO-2026-00089',
     type: 'O&A',
     subtype: 'Price Deviation',
     partNumber: '991823',
@@ -252,6 +266,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-005 — open, Additional Repair, customer rejected (CSM still to follow up)
   build({
     seq: 5,
+    workOrderId: 'WO-2026-00142',
     type: 'O&A',
     subtype: 'Additional Repair',
     partNumber: '667234',
@@ -351,6 +366,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-008 — open, Additional Replace, customer approved (CSM still to close out)
   build({
     seq: 8,
+    workOrderId: 'WO-2026-00089',
     type: 'O&A',
     subtype: 'Additional Replace',
     partNumber: '778899',
@@ -376,6 +392,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-009 — open, Additional Repair, awaiting customer decision
   build({
     seq: 9,
+    workOrderId: 'WO-2026-00142',
     type: 'O&A',
     subtype: 'Additional Repair',
     partNumber: '229981',
@@ -422,6 +439,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-011 — closed, Customer Provided Part, Approved
   build({
     seq: 11,
+    workOrderId: 'WO-2026-00089',
     type: 'Purchase',
     subtype: 'Customer Provided Part',
     partNumber: '118820',
@@ -459,6 +477,7 @@ export const INITIAL_APPROVALS: Approval[] = [
   // APP-012 — open, LLP Purchase, customer requested clarification
   build({
     seq: 12,
+    workOrderId: 'WO-2026-00142',
     type: 'Purchase',
     subtype: 'LLP Purchase',
     partNumber: '556710',

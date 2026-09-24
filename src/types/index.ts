@@ -105,6 +105,7 @@ export interface CustomerAccess {
 export interface Approval {
   id: string; // APP-001
   seq: number;
+  workOrderId: string;
   type: ApprovalType;
   subtype: Subtype;
   partNumber?: string;
@@ -127,6 +128,12 @@ export interface Approval {
 export interface Customer {
   id: string;
   name: string;
+}
+
+export interface WorkOrder {
+  id: string;
+  engineModel: string;
+  esn: string;
 }
 
 export interface InternalMember {

@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { APPROVAL_TYPES, SUBTYPES_BY_TYPE } from '../types';
 import type { ApprovalType, Attachment, Approval, ConversationMessage } from '../types';
 import { useStore, genMessageId } from '../state/store';
-import { CUSTOMERS } from '../data/seed';
+import { CUSTOMERS, WORK_ORDERS } from '../data/seed';
 import { AttachmentManager } from './AttachmentManager';
 import { CustomerMultiSelect } from './CustomerMultiSelect';
 
@@ -13,6 +13,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 }) => {
   const { dispatch, nextSeq } = useStore();
 
+  const [workOrderId, setWorkOrderId] = React.useState('');
   const [approvalType, setApprovalType] = React.useState<ApprovalType | ''>('');
   const [subtype, setSubtype] = React.useState('');
   const [partNumber, setPartNumber] = React.useState('');
@@ -29,6 +30,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 
   function validate() {
     const e: Record<string, string> = {};
+    if (!workOrderId) e.workOrderId = 'Work Order is required.';
     if (!approvalType) e.approvalType = 'Approval Type is required.';
     if (!requirement.trim()) e.requirement = 'Requirement is required.';
     setErrors(e);
@@ -36,7 +38,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
   }
 
   function handleSubmit() {
-    if (!validate() || !approvalType) return;
+    if (!validate() || !workOrderId || !approvalType) return;
 
     const seq = nextSeq();
     const id = `APP-${String(seq).padStart(3, '0')}`;
@@ -58,6 +60,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
     const approval: Approval = {
       id,
       seq,
+      workOrderId,
       type: approvalType,
       subtype: (subtype || null) as Approval['subtype'],
       partNumber: partNumber || undefined,
@@ -111,6 +114,23 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
         </div>
 
         <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+          <div>
+            <label className="field-label">Work Order *</label>
+            <select
+              value={workOrderId}
+              onChange={(e) => setWorkOrderId(e.target.value)}
+              className="select-input"
+            >
+              <option value="" disabled hidden>Select a work order</option>
+              {WORK_ORDERS.map((wo) => (
+                <option key={wo.id} value={wo.id}>
+                  {wo.id} — {wo.engineModel} · ESN {wo.esn}
+                </option>
+              ))}
+            </select>
+            {errors.workOrderId && <p className="mt-1 text-xs text-red-600">{errors.workOrderId}</p>}
+          </div>
+
           <div>
             <label className="field-label">Approval Type *</label>
             <select
