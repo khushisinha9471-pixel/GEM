@@ -44,12 +44,32 @@ export const ApprovalsTable: React.FC<{
   const [pendingDecision, setPendingDecision] = React.useState<CustomerDecision | null>(null);
   const decisionRef = React.useRef<HTMLDivElement>(null);
   const [collapsedGroups, setCollapsedGroups] = React.useState<Set<ApprovalType>>(new Set());
+  const [collapsedWorkOrders, setCollapsedWorkOrders] = React.useState<Set<string>>(new Set());
+  const [collapsedTypesByWO, setCollapsedTypesByWO] = React.useState<Set<string>>(new Set());
 
   function toggleGroupCollapsed(t: ApprovalType) {
     setCollapsedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(t)) next.delete(t);
       else next.add(t);
+      return next;
+    });
+  }
+
+  function toggleWorkOrderCollapsed(workOrderId: string) {
+    setCollapsedWorkOrders((prev) => {
+      const next = new Set(prev);
+      if (next.has(workOrderId)) next.delete(workOrderId);
+      else next.add(workOrderId);
+      return next;
+    });
+  }
+
+  function toggleTypeInWorkOrder(key: string) {
+    setCollapsedTypesByWO((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   }
@@ -79,10 +99,21 @@ export const ApprovalsTable: React.FC<{
     );
   }
 
-  const groups = APPROVAL_TYPES.map((t) => ({
+  // Customer screen: single-level grouping by Type.
+  const typeGroups = APPROVAL_TYPES.map((t) => ({
     type: t,
     rows: approvals.filter((a) => a.type === t),
   })).filter((g) => g.rows.length > 0);
+
+  // CSM screen: Work Order is the outer grouping, Type nested inside it.
+  const workOrderGroups = WORK_ORDERS.map((wo) => {
+    const woApprovals = approvals.filter((a) => a.workOrderId === wo.id);
+    const typeSubGroups = APPROVAL_TYPES.map((t) => ({
+      type: t,
+      rows: woApprovals.filter((a) => a.type === t),
+    })).filter((g) => g.rows.length > 0);
+    return { workOrder: wo, typeSubGroups };
+  }).filter((g) => g.typeSubGroups.length > 0);
 
   function renderRow(a: Approval, rowNumber: number) {
     const gemMsg = latestCsmResponse(a);
@@ -90,18 +121,10 @@ export const ApprovalsTable: React.FC<{
             const gemClickable = role === 'csm';
             const customerColClickable = role === 'customer';
             const approvalReqClickable = role === 'customer';
-            const workOrder = WORK_ORDERS.find((wo) => wo.id === a.workOrderId);
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
                 <td className="px-2 py-3 align-top text-right text-xs text-slate">{rowNumber}</td>
-
-                {role === 'csm' && (
-                  <td className="break-words px-3 py-3 align-top text-sm text-navy">
-                    {a.workOrderId}
-                    {workOrder && <div className="mt-0.5 text-[11px] font-medium text-slate">{workOrder.engineModel}</div>}
-                  </td>
-                )}
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -275,20 +298,18 @@ export const ApprovalsTable: React.FC<{
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
           <col className="w-[40px]" />
-          {!isCustomer && <col className="w-[92px]" />}
           <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
-          <col className={isCustomer ? 'w-[100px]' : 'w-[92px]'} />
-          <col className={isCustomer ? 'w-[108px]' : 'w-[100px]'} />
-          <col className={isCustomer ? 'w-[257px]' : 'w-[200px]'} />
-          <col className={isCustomer ? 'w-[74px]' : 'w-[70px]'} />
-          <col className={isCustomer ? 'w-[112px]' : 'w-[106px]'} />
-          <col className={isCustomer ? 'w-[241px]' : 'w-[205px]'} />
-          <col className={isCustomer ? 'w-[240px]' : 'w-[205px]'} />
+          <col className="w-[100px]" />
+          <col className="w-[108px]" />
+          <col className={isCustomer ? 'w-[257px]' : 'w-[236px]'} />
+          <col className="w-[74px]" />
+          <col className="w-[112px]" />
+          <col className={isCustomer ? 'w-[241px]' : 'w-[220px]'} />
+          <col className={isCustomer ? 'w-[240px]' : 'w-[220px]'} />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
             <th className="px-2 py-3 text-right">S.No.</th>
-            {!isCustomer && <th className="px-3 py-3">Work Order</th>}
             <th className="px-2 py-3">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
@@ -302,25 +323,77 @@ export const ApprovalsTable: React.FC<{
         <tbody>
           {(() => {
             let rowNumber = 0;
-            return groups.map((g) => (
-              <React.Fragment key={g.type}>
-                <tr className="border-b border-line bg-surface/70">
-                  <td colSpan={isCustomer ? 9 : 10} className="px-3 py-3">
-                    <button
-                      onClick={() => toggleGroupCollapsed(g.type)}
-                      className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
-                    >
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
-                      />
-                      {g.type}
-                    </button>
-                  </td>
-                </tr>
-                {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a, ++rowNumber))}
-              </React.Fragment>
-            ));
+
+            if (isCustomer) {
+              return typeGroups.map((g) => (
+                <React.Fragment key={g.type}>
+                  <tr className="border-b border-line bg-surface/70">
+                    <td colSpan={9} className="px-3 py-3">
+                      <button
+                        onClick={() => toggleGroupCollapsed(g.type)}
+                        className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
+                      >
+                        <ChevronDown
+                          size={16}
+                          className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
+                        />
+                        {g.type}
+                      </button>
+                    </td>
+                  </tr>
+                  {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a, ++rowNumber))}
+                </React.Fragment>
+              ));
+            }
+
+            return workOrderGroups.map((wg) => {
+              const woCollapsed = collapsedWorkOrders.has(wg.workOrder.id);
+              return (
+                <React.Fragment key={wg.workOrder.id}>
+                  <tr className="border-b border-line bg-navy-50">
+                    <td colSpan={9} className="px-3 py-3.5">
+                      <button
+                        onClick={() => toggleWorkOrderCollapsed(wg.workOrder.id)}
+                        className="flex items-center gap-2.5 text-base font-bold text-navy"
+                      >
+                        <ChevronDown
+                          size={18}
+                          className={`transition-transform ${woCollapsed ? '-rotate-90' : ''}`}
+                        />
+                        {wg.workOrder.id}
+                        <span className="text-sm font-medium text-slate">
+                          {wg.workOrder.engineModel} · ESN {wg.workOrder.esn}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                  {!woCollapsed &&
+                    wg.typeSubGroups.map((tg) => {
+                      const key = `${wg.workOrder.id}::${tg.type}`;
+                      const typeCollapsed = collapsedTypesByWO.has(key);
+                      return (
+                        <React.Fragment key={key}>
+                          <tr className="border-b border-line bg-surface/60">
+                            <td colSpan={9} className="py-2.5 pl-10 pr-3">
+                              <button
+                                onClick={() => toggleTypeInWorkOrder(key)}
+                                className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-navy"
+                              >
+                                <ChevronDown
+                                  size={14}
+                                  className={`transition-transform ${typeCollapsed ? '-rotate-90' : ''}`}
+                                />
+                                {tg.type}
+                              </button>
+                            </td>
+                          </tr>
+                          {!typeCollapsed && tg.rows.map((a) => renderRow(a, ++rowNumber))}
+                        </React.Fragment>
+                      );
+                    })}
+                </React.Fragment>
+              );
+            });
           })()}
         </tbody>
       </table>
