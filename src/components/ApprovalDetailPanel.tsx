@@ -3,7 +3,6 @@ import {
   X,
   ShieldCheck,
   Send,
-  CheckCircle2,
   RotateCcw,
   FlaskConical,
   Trash2,
@@ -39,8 +38,7 @@ export const ApprovalDetailPanel: React.FC<{
   approval: Approval;
   serial: number;
   onClose: () => void;
-  onRequestClose: (approvalId: string) => void;
-}> = ({ approval, serial, onClose, onRequestClose }) => {
+}> = ({ approval, serial, onClose }) => {
   const { dispatch } = useStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
   const [accessOpen, setAccessOpen] = React.useState(false);
@@ -81,7 +79,7 @@ export const ApprovalDetailPanel: React.FC<{
 
   return (
     <div className="modal-overlay">
-      <div className="flex h-full w-full max-w-3xl flex-col overflow-hidden bg-white shadow-pop">
+      <div className="flex h-full w-full max-w-5xl flex-col overflow-hidden bg-white shadow-pop">
         {/* Header */}
         <div className="border-b border-line px-6 py-5">
           <div className="flex items-start justify-between">
@@ -102,12 +100,7 @@ export const ApprovalDetailPanel: React.FC<{
               <ShieldCheck size={14} />
               Access: {accessLabel.length > 28 ? `${accessLabel.slice(0, 28)}…` : accessLabel}
             </button>
-            {approval.status === 'Open' ? (
-              <button onClick={() => onRequestClose(approval.id)} className="btn-primary">
-                <CheckCircle2 size={14} />
-                Close Approval
-              </button>
-            ) : (
+            {approval.status !== 'Open' && (
               <button onClick={() => dispatch({ type: 'REOPEN_APPROVAL', approvalId: approval.id })} className="btn-secondary">
                 <RotateCcw size={14} />
                 Reopen
@@ -145,19 +138,20 @@ export const ApprovalDetailPanel: React.FC<{
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {tab === 'conversation' && (
-            <div className="space-y-5">
-              <div className="flex items-center justify-end">
-                <button onClick={() => setForwardOpen(true)} className="btn-secondary flex-none">
-                  <Send size={14} />
-                  Forward to Internal Member
-                </button>
-              </div>
+            <div className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+                <div className="flex items-center justify-end">
+                  <button onClick={() => setForwardOpen(true)} className="btn-secondary flex-none">
+                    <Send size={14} />
+                    Forward to Internal Member
+                  </button>
+                </div>
 
-              <ConversationThread messages={feed} emptyLabel="No conversation yet." />
+                <ConversationThread messages={feed} emptyLabel="No conversation yet." />
 
-              {awaiting.map((f) => (
+                {awaiting.map((f) => (
                 <div key={f.id} className="rounded-xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -199,13 +193,14 @@ export const ApprovalDetailPanel: React.FC<{
                   )}
                 </div>
               ))}
+              </div>
 
-              <div className="rounded-xl border border-line p-4">
+              <div className="flex-none border-t border-line px-6 py-4">
                 <label className="field-label">GEM Comment</label>
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
-                  rows={3}
+                  rows={2}
                   placeholder="Write a message to the customer..."
                   className="textarea-input"
                 />
@@ -222,9 +217,17 @@ export const ApprovalDetailPanel: React.FC<{
             </div>
           )}
 
-          {tab === 'attachments' && <ApprovalAttachmentsView approval={approval} />}
+          {tab === 'attachments' && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <ApprovalAttachmentsView approval={approval} />
+            </div>
+          )}
 
-          {tab === 'audit' && <AuditTrailView approval={approval} />}
+          {tab === 'audit' && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <AuditTrailView approval={approval} />
+            </div>
+          )}
         </div>
       </div>
 

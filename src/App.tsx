@@ -104,7 +104,6 @@ const AppShell: React.FC = () => {
           approval={selectedApproval}
           serial={selectedSerial ?? 0}
           onClose={() => setSelectedApprovalId(null)}
-          onRequestClose={(id) => dispatch({ type: 'REQUEST_CLOSE', approvalId: id })}
         />
       )}
     </div>
