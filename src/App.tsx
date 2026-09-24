@@ -1,6 +1,5 @@
 import React from 'react';
 import { StoreProvider, useStore } from './state/store';
-import { WORK_ORDERS } from './data/seed';
 import { Header } from './components/Header';
 import { SummaryCards } from './components/SummaryCards';
 import { Toolbar, DEFAULT_FILTERS, type Filters } from './components/Toolbar';
@@ -51,9 +50,6 @@ const AppShell: React.FC = () => {
       <div className="flex flex-1 flex-col overflow-hidden px-8">
         <div className="flex-none pb-4 pt-6">
           <h1 className="text-[26px] font-bold tracking-tight text-navy">Customer Approvals</h1>
-          <p className="mt-1 text-sm text-slate">
-            <span className="font-semibold text-navy">Work Orders:</span> {WORK_ORDERS.length} active
-          </p>
 
           <div className="mt-4">
             <SummaryCards
