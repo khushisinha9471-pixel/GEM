@@ -29,6 +29,7 @@ const AppShell: React.FC = () => {
   const filtered = approvals
     .filter((a) => (effectiveStatus === 'All' ? true : a.status === effectiveStatus))
     .filter((a) => (overdueOnly ? isOverdue(a) : true))
+    .filter((a) => (filters.workOrderId === 'All' ? true : a.workOrderId === filters.workOrderId))
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
     .filter((a) =>
       filters.decision === 'All'

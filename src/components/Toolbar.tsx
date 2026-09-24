@@ -2,16 +2,18 @@ import React from 'react';
 import { Search, Filter, Plus, X } from 'lucide-react';
 import type { ApprovalType, CustomerDecision } from '../types';
 import { APPROVAL_TYPES, CUSTOMER_DECISIONS } from '../types';
+import { WORK_ORDERS } from '../data/seed';
 
 export type DecisionFilter = 'All' | 'Awaiting Decision' | CustomerDecision;
 
 export interface Filters {
+  workOrderId: 'All' | string;
   approvalType: 'All' | ApprovalType;
   decision: DecisionFilter;
   status: 'All' | 'Open' | 'Closed';
 }
 
-export const DEFAULT_FILTERS: Filters = { approvalType: 'All', decision: 'All', status: 'All' };
+export const DEFAULT_FILTERS: Filters = { workOrderId: 'All', approvalType: 'All', decision: 'All', status: 'All' };
 
 export const Toolbar: React.FC<{
   search: string;
@@ -32,6 +34,7 @@ export const Toolbar: React.FC<{
   }, []);
 
   const activeFilterCount = [
+    filters.workOrderId !== 'All',
     filters.approvalType !== 'All',
     filters.decision !== 'All',
     filters.status !== 'All',
@@ -85,6 +88,21 @@ export const Toolbar: React.FC<{
                 Clear all
               </button>
             </div>
+
+            <FilterField label="Work Order">
+              <select
+                value={filters.workOrderId}
+                onChange={(e) => onFilters({ ...filters, workOrderId: e.target.value })}
+                className="select-input"
+              >
+                <option value="All">All Work Orders</option>
+                {WORK_ORDERS.map((wo) => (
+                  <option key={wo.id} value={wo.id}>
+                    {wo.id} — {wo.engineModel}
+                  </option>
+                ))}
+              </select>
+            </FilterField>
 
             <FilterField label="Type">
               <select
