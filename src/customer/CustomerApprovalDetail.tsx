@@ -45,7 +45,7 @@ export const CustomerApprovalDetail: React.FC<{
 
   return (
     <div className="modal-overlay">
-      <div className="flex h-full w-full max-w-3xl flex-col overflow-hidden bg-white shadow-pop">
+      <div className="flex h-full w-full max-w-5xl flex-col overflow-hidden bg-white shadow-pop">
         {/* Header */}
         <div className="border-b border-line px-6 py-5">
           <div className="flex items-start justify-between">
@@ -83,12 +83,14 @@ export const CustomerApprovalDetail: React.FC<{
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {tab === 'conversation' && (
-            <div className="space-y-5">
-              <ConversationThread messages={visibleMessages} emptyLabel="No conversation yet on this approval." />
+            <div className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 overflow-y-auto px-6 py-5">
+                <ConversationThread messages={visibleMessages} emptyLabel="No conversation yet on this approval." />
+              </div>
 
-              <div className="rounded-xl border border-line p-4">
+              <div className="flex-none border-t border-line px-6 py-4">
                 <label className="field-label">Your Decision</label>
                 <select
                   value={decision ?? ''}
@@ -107,7 +109,7 @@ export const CustomerApprovalDetail: React.FC<{
                 <textarea
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
-                  rows={3}
+                  rows={2}
                   placeholder="Add any additional comment..."
                   className="textarea-input"
                 />
@@ -124,7 +126,11 @@ export const CustomerApprovalDetail: React.FC<{
             </div>
           )}
 
-          {tab === 'attachments' && <CustomerAttachmentsView approval={approval} />}
+          {tab === 'attachments' && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <CustomerAttachmentsView approval={approval} />
+            </div>
+          )}
         </div>
       </div>
     </div>
