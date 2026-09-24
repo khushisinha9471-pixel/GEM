@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, SlidersHorizontal, Plus, X } from 'lucide-react';
+import { Search, Filter, Plus, X } from 'lucide-react';
 import type { ApprovalType, CustomerDecision } from '../types';
 import { APPROVAL_TYPES, CUSTOMER_DECISIONS } from '../types';
 
@@ -65,12 +65,12 @@ export const Toolbar: React.FC<{
       <div className="relative" ref={popRef}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium shadow-card ${
+          title="Filters"
+          className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 shadow-card ${
             activeFilterCount > 0 ? 'border-navy bg-navy-50 text-navy' : 'border-line bg-white text-slate hover:text-navy'
           }`}
         >
-          <SlidersHorizontal size={15} />
-          Filters
+          <Filter size={16} />
           {activeFilterCount > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-navy px-1 text-[11px] font-semibold text-white">
               {activeFilterCount}
