@@ -351,17 +351,17 @@ export const ApprovalsTable: React.FC<{
               return (
                 <React.Fragment key={wg.workOrder.id}>
                   <tr className="border-b border-line bg-navy-50">
-                    <td colSpan={9} className="px-3 py-3.5">
+                    <td colSpan={9} className="px-3 py-2">
                       <button
                         onClick={() => toggleWorkOrderCollapsed(wg.workOrder.id)}
-                        className="flex items-center gap-2.5 text-base font-bold text-navy"
+                        className="flex items-center gap-2 text-sm font-bold text-navy"
                       >
                         <ChevronDown
-                          size={18}
+                          size={15}
                           className={`transition-transform ${woCollapsed ? '-rotate-90' : ''}`}
                         />
                         {wg.workOrder.id}
-                        <span className="text-sm font-medium text-slate">
+                        <span className="text-xs font-medium text-slate">
                           {wg.workOrder.engineModel} · ESN {wg.workOrder.esn}
                         </span>
                       </button>
