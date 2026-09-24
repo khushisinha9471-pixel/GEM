@@ -47,43 +47,45 @@ export const AttachmentManager: React.FC<{
   return (
     <div>
       <label className="field-label">{label}</label>
-      <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => setPickerOpen(true)} className="btn-secondary">
-          <Link2 size={14} />
-          Link from Reports Library
-        </button>
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
-          <Upload size={14} />
-          Add External Attachment
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={(e) => {
-            addExternalFiles(e.target.files);
-            e.target.value = '';
-          }}
-        />
-      </div>
+      <div className="group">
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setPickerOpen(true)} className="btn-secondary">
+            <Link2 size={14} />
+            Link from Reports Library
+          </button>
+          <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-secondary">
+            <Upload size={14} />
+            Add External Attachment
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              addExternalFiles(e.target.files);
+              e.target.value = '';
+            }}
+          />
+        </div>
 
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          addExternalFiles(e.dataTransfer.files);
-        }}
-        className={`mt-2 rounded-lg border border-dashed px-3 py-3 text-center text-xs transition ${
-          dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
-        }`}
-      >
-        Drag and drop files here, or use the buttons above
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            addExternalFiles(e.dataTransfer.files);
+          }}
+          className={`mt-2 hidden rounded-lg border border-dashed px-3 py-3 text-center text-xs transition group-hover:block ${
+            dragOver ? 'border-navy bg-navy-50 text-navy' : 'border-line text-slate/70'
+          }`}
+        >
+          Drag and drop files here, or use the buttons above
+        </div>
       </div>
 
       {attachments.length > 0 && (
