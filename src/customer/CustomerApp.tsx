@@ -1,6 +1,5 @@
 import React from 'react';
 import { CustomerStoreProvider, useCustomerStore } from './customerStore';
-import { WORK_ORDER } from '../data/seed';
 import { CustomerHeader } from './CustomerHeader';
 import { SummaryCards } from '../components/SummaryCards';
 import { CustomerToolbar, DEFAULT_CUSTOMER_FILTERS, type CustomerFilters } from './CustomerToolbar';
@@ -29,6 +28,7 @@ const CustomerAppShell: React.FC = () => {
   const filtered = approvals
     .filter((a) => (effectiveStatus === 'All' ? true : a.status === effectiveStatus))
     .filter((a) => (overdueOnly ? isOverdue(a) : true))
+    .filter((a) => (filters.workOrderId === 'All' ? true : a.workOrderId === filters.workOrderId))
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
     .filter((a) =>
       filters.decision === 'All'
@@ -59,11 +59,6 @@ const CustomerAppShell: React.FC = () => {
       <div className="flex flex-1 flex-col overflow-hidden px-8">
         <div className="flex-none pb-4 pt-6">
           <h1 className="text-[26px] font-bold tracking-tight text-navy">Approvals</h1>
-          <p className="mt-1 text-sm text-slate">
-            <span className="font-semibold text-navy">Work Order:</span> {WORK_ORDER.id}
-            <span className="mx-2 text-line">|</span>
-            <span className="font-semibold text-navy">Engine:</span> {WORK_ORDER.engineModel} | ESN {WORK_ORDER.esn}
-          </p>
 
           <div className="mt-4">
             <SummaryCards

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Approval, ApprovalType, CustomerDecision } from '../types';
+import type { Approval, CustomerDecision } from '../types';
 import { APPROVAL_TYPES, CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill } from './StatusPill';
 import { formatCost, formatDate, formatDateTime } from '../utils/format';
@@ -43,18 +43,8 @@ export const ApprovalsTable: React.FC<{
   const [decisionOpenId, setDecisionOpenId] = React.useState<string | null>(null);
   const [pendingDecision, setPendingDecision] = React.useState<CustomerDecision | null>(null);
   const decisionRef = React.useRef<HTMLDivElement>(null);
-  const [collapsedGroups, setCollapsedGroups] = React.useState<Set<ApprovalType>>(new Set());
   const [collapsedWorkOrders, setCollapsedWorkOrders] = React.useState<Set<string>>(new Set());
   const [collapsedTypesByWO, setCollapsedTypesByWO] = React.useState<Set<string>>(new Set());
-
-  function toggleGroupCollapsed(t: ApprovalType) {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(t)) next.delete(t);
-      else next.add(t);
-      return next;
-    });
-  }
 
   function toggleWorkOrderCollapsed(workOrderId: string) {
     setCollapsedWorkOrders((prev) => {
@@ -99,13 +89,7 @@ export const ApprovalsTable: React.FC<{
     );
   }
 
-  // Customer screen: single-level grouping by Type.
-  const typeGroups = APPROVAL_TYPES.map((t) => ({
-    type: t,
-    rows: approvals.filter((a) => a.type === t),
-  })).filter((g) => g.rows.length > 0);
-
-  // CSM screen: Work Order is the outer grouping, Type nested inside it.
+  // Work Order is the outer grouping, Type nested inside it — same on both screens.
   const workOrderGroups = WORK_ORDERS.map((wo) => {
     const woApprovals = approvals.filter((a) => a.workOrderId === wo.id);
     const typeSubGroups = APPROVAL_TYPES.map((t) => ({
@@ -323,28 +307,6 @@ export const ApprovalsTable: React.FC<{
         <tbody>
           {(() => {
             let rowNumber = 0;
-
-            if (isCustomer) {
-              return typeGroups.map((g) => (
-                <React.Fragment key={g.type}>
-                  <tr className="border-b border-line bg-surface/70">
-                    <td colSpan={9} className="px-3 py-3">
-                      <button
-                        onClick={() => toggleGroupCollapsed(g.type)}
-                        className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy"
-                      >
-                        <ChevronDown
-                          size={16}
-                          className={`transition-transform ${collapsedGroups.has(g.type) ? '-rotate-90' : ''}`}
-                        />
-                        {g.type}
-                      </button>
-                    </td>
-                  </tr>
-                  {!collapsedGroups.has(g.type) && g.rows.map((a) => renderRow(a, ++rowNumber))}
-                </React.Fragment>
-              ));
-            }
 
             return workOrderGroups.map((wg) => {
               const woCollapsed = collapsedWorkOrders.has(wg.workOrder.id);
