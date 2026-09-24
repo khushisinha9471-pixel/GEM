@@ -287,7 +287,7 @@ export const INITIAL_APPROVALS: Approval[] = [
     extraAudit: [auditEvt('2026-09-02T14:00:00+05:30', 'Priya Patel', 'Customer responded', 'Rejected.')],
   }),
 
-  // APP-006 — closed, Another Part Installed scenario
+  // APP-006 — open, Additional Replace, awaiting customer decision
   build({
     seq: 6,
     type: 'O&A',
@@ -296,34 +296,20 @@ export const INITIAL_APPROVALS: Approval[] = [
     partDescription: 'Oil Pressure Sensor',
     requirement: 'The original sensor part was not approved, so we found a different part. Please confirm you are okay with installing it instead.',
     cost: 4100,
-    status: 'Closed',
-    createdAt: '2026-08-30T09:00:00+05:30',
+    status: 'Open',
+    createdAt: '2026-09-05T09:00:00+05:30',
     messages: [
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
         body: 'An alternative part has been sourced for this replacement — please confirm you are comfortable proceeding with it.',
-        date: '2026-08-30T10:00:00+05:30',
+        date: '2026-09-05T10:00:00+05:30',
       }),
-      msg({
-        channel: 'customer',
-        authorName: 'James Anderson',
-        authorRole: 'Customer',
-        body: 'Alternative part approved for installation.',
-        date: '2026-08-30T15:00:00+05:30',
-        decision: 'Approved',
-      }),
-    ],
-    outcome: 'Another Part Installed',
-    customerDecision: 'Approved',
-    closedAt: '2026-08-31T09:00:00+05:30',
-    extraAudit: [
-      auditEvt('2026-08-31T09:00:00+05:30', 'Harini V (CSM)', 'Status changed to Closed', 'Final Outcome recorded: Another Part Installed.'),
     ],
   }),
 
-  // APP-007 — open, Additional Repair, customer asked a question
+  // APP-007 — open, Additional Repair, awaiting customer decision
   build({
     seq: 7,
     type: 'O&A',
@@ -342,16 +328,7 @@ export const INITIAL_APPROVALS: Approval[] = [
         body: 'Please review the inspection findings and confirm whether the additional repair may proceed.',
         date: '2026-09-08T13:20:00+05:30',
       }),
-      msg({
-        channel: 'customer',
-        authorName: 'Priya Patel',
-        authorRole: 'Customer',
-        body: 'Can you share more details on the inspection findings before we decide?',
-        date: '2026-09-08T18:00:00+05:30',
-        decision: 'Clarification Requested',
-      }),
     ],
-    customerDecision: 'Clarification Requested',
   }),
 
   // APP-008 — open, Additional Replace, customer approved (CSM still to close out)
