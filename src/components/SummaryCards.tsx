@@ -12,7 +12,7 @@ export const SummaryCards: React.FC<{
     <div className="flex flex-wrap gap-3">
       <button
         onClick={onToggleOpen}
-        className={`min-w-[150px] rounded-xl border bg-white p-3 text-left shadow-card transition ${
+        className={`flex min-w-[150px] flex-col items-stretch justify-start rounded-xl border bg-white p-3 text-left shadow-card transition ${
           openActive ? 'border-amber-400 ring-2 ring-amber-200' : 'border-line hover:border-amber-300'
         }`}
       >
@@ -24,7 +24,7 @@ export const SummaryCards: React.FC<{
       </button>
       <button
         onClick={onToggleOverdue}
-        className={`min-w-[150px] rounded-xl border bg-white p-3 text-left shadow-card transition ${
+        className={`flex min-w-[150px] flex-col items-stretch justify-start rounded-xl border bg-white p-3 text-left shadow-card transition ${
           overdueActive ? 'border-red-400 ring-2 ring-red-200' : 'border-line hover:border-red-300'
         }`}
       >
