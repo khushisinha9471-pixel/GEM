@@ -60,18 +60,13 @@ export function approvalRequestUpdatedAt(a: Approval): string {
   return decisionDate(a) ?? latestCsmResponse(a)?.date ?? a.createdAt;
 }
 
-const OVERDUE_THRESHOLD_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
+const OVERDUE_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
 
-// Still awaiting a customer decision and has been open for more than 10 days
+// Still awaiting a customer decision and has been open for more than 3 days
 // (relative to the fixed demo "now", not the viewer's real clock).
 export function isOverdue(a: Approval): boolean {
   if (a.status !== 'Open' || a.customerDecision) return false;
   return new Date(DEMO_NOW).getTime() - new Date(a.createdAt).getTime() > OVERDUE_THRESHOLD_MS;
-}
-
-// Total cost across approvals still awaiting a customer decision.
-export function pendingApprovalValue(approvals: Approval[]): number {
-  return approvals.filter((a) => a.status === 'Open' && !a.customerDecision).reduce((sum, a) => sum + (a.cost ?? 0), 0);
 }
 
 export function searchableText(a: Approval): string {

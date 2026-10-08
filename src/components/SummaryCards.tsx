@@ -1,15 +1,13 @@
 import React from 'react';
-import { formatCost } from '../utils/format';
 
 export const SummaryCards: React.FC<{
   openCount: number;
   overdueCount: number;
-  pendingValue: number;
   openActive: boolean;
   overdueActive: boolean;
   onToggleOpen: () => void;
   onToggleOverdue: () => void;
-}> = ({ openCount, overdueCount, pendingValue, openActive, overdueActive, onToggleOpen, onToggleOverdue }) => {
+}> = ({ openCount, overdueCount, openActive, overdueActive, onToggleOpen, onToggleOverdue }) => {
   return (
     <div className="flex flex-wrap gap-3">
       <button
@@ -26,7 +24,6 @@ export const SummaryCards: React.FC<{
       </button>
       <button
         onClick={onToggleOverdue}
-        title="Approval has been open for more than 10 days"
         className={`min-w-[150px] rounded-xl border bg-white p-3 text-left shadow-card transition ${
           overdueActive ? 'border-red-400 ring-2 ring-red-200' : 'border-line hover:border-red-300'
         }`}
@@ -35,16 +32,8 @@ export const SummaryCards: React.FC<{
           <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Overdue Approvals</span>
         </div>
         <div className="mt-1 text-xl font-bold text-navy">{overdueCount}</div>
+        <div className="mt-0.5 text-[9px] font-medium leading-tight text-slate/70">Open for more than 3 days</div>
       </button>
-      <div
-        title="Total accumulated cost associated with all open approvals"
-        className="min-w-[150px] rounded-xl border border-line bg-white p-3 shadow-card"
-      >
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Pending Approvals Value</span>
-        </div>
-        <div className="mt-1 text-xl font-bold text-navy">{formatCost(pendingValue)}</div>
-      </div>
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { ApprovalsTable } from './components/ApprovalsTable';
 import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
-import { searchableText, serialNumberOf, isOverdue, pendingApprovalValue } from './utils/approvalHelpers';
+import { searchableText, serialNumberOf, isOverdue } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 
 const AppShell: React.FC = () => {
@@ -22,7 +22,6 @@ const AppShell: React.FC = () => {
   const approvals = state.approvals;
   const openCount = approvals.filter((a) => a.status === 'Open').length;
   const overdueCount = approvals.filter(isOverdue).length;
-  const pendingValue = pendingApprovalValue(approvals);
 
   const effectiveStatus: ApprovalStatus | 'All' = filters.status !== 'All' ? filters.status : statusCard;
 
@@ -56,7 +55,6 @@ const AppShell: React.FC = () => {
             <SummaryCards
               openCount={openCount}
               overdueCount={overdueCount}
-              pendingValue={pendingValue}
               openActive={statusCard === 'Open'}
               overdueActive={overdueOnly}
               onToggleOpen={() => setStatusCard((c) => (c === 'Open' ? 'All' : 'Open'))}

@@ -6,7 +6,7 @@ import { CustomerToolbar, DEFAULT_CUSTOMER_FILTERS, type CustomerFilters } from 
 import { ApprovalsTable } from '../components/ApprovalsTable';
 import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
-import { searchableText, serialNumberOf, isOverdue, pendingApprovalValue } from '../utils/approvalHelpers';
+import { searchableText, serialNumberOf, isOverdue } from '../utils/approvalHelpers';
 import type { Approval, ApprovalStatus, CustomerDecision } from '../types';
 
 const CustomerAppShell: React.FC = () => {
@@ -21,7 +21,6 @@ const CustomerAppShell: React.FC = () => {
   const approvals = state.approvals;
   const openCount = approvals.filter((a) => a.status === 'Open').length;
   const overdueCount = approvals.filter(isOverdue).length;
-  const pendingValue = pendingApprovalValue(approvals);
 
   const effectiveStatus: ApprovalStatus | 'All' = filters.status !== 'All' ? filters.status : statusCard;
 
@@ -64,7 +63,6 @@ const CustomerAppShell: React.FC = () => {
             <SummaryCards
               openCount={openCount}
               overdueCount={overdueCount}
-              pendingValue={pendingValue}
               openActive={statusCard === 'Open'}
               overdueActive={overdueOnly}
               onToggleOpen={() => setStatusCard((c) => (c === 'Open' ? 'All' : 'Open'))}
