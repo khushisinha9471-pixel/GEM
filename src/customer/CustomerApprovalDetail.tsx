@@ -13,10 +13,9 @@ type Tab = 'conversation' | 'attachments';
 
 export const CustomerApprovalDetail: React.FC<{
   approval: Approval;
-  serial: number;
   onClose: () => void;
   initialDecision?: CustomerDecision | null;
-}> = ({ approval, serial, onClose, initialDecision }) => {
+}> = ({ approval, onClose, initialDecision }) => {
   const { dispatch } = useCustomerStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
   const [decision, setDecision] = React.useState<CustomerDecision | null>(
@@ -51,7 +50,7 @@ export const CustomerApprovalDetail: React.FC<{
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-navy">#{serial}</h2>
+                <h2 className="text-xl font-bold text-navy">{approval.id}</h2>
                 <StatusPill status={approval.status} />
                 {approval.outcome && <OutcomeBadge outcome={approval.outcome} />}
               </div>

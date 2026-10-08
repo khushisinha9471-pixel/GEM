@@ -7,7 +7,7 @@ import { ApprovalsTable } from './components/ApprovalsTable';
 import { ToastContainer } from './components/ToastContainer';
 import { CreateApprovalModal } from './components/CreateApprovalModal';
 import { ApprovalDetailPanel } from './components/ApprovalDetailPanel';
-import { searchableText, serialNumberOf, isOverdue } from './utils/approvalHelpers';
+import { searchableText, isOverdue } from './utils/approvalHelpers';
 import type { Approval, ApprovalStatus } from './types';
 
 const AppShell: React.FC = () => {
@@ -38,10 +38,19 @@ const AppShell: React.FC = () => {
         : a.customerDecision === filters.decision
     )
     .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())))
-    .sort((a, b) => b.seq - a.seq);
+    .sort((a, b) => {
+      // Open approvals first, longest-open at the top; Closed approvals after,
+      // most recently closed at the top.
+      if (a.status !== b.status) return a.status === 'Open' ? -1 : 1;
+      if (a.status === 'Open') {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      const aClosed = new Date(a.closedAt ?? a.createdAt).getTime();
+      const bClosed = new Date(b.closedAt ?? b.createdAt).getTime();
+      return bClosed - aClosed;
+    });
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
-  const selectedSerial = serialNumberOf(approvals, filtered, selectedApprovalId);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-surface">
@@ -95,7 +104,6 @@ const AppShell: React.FC = () => {
       {selectedApproval && (
         <ApprovalDetailPanel
           approval={selectedApproval}
-          serial={selectedSerial ?? 0}
           onClose={() => setSelectedApprovalId(null)}
         />
       )}

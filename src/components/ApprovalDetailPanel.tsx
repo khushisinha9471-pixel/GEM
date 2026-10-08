@@ -36,9 +36,8 @@ const SIMULATED_REPLIES = [
 
 export const ApprovalDetailPanel: React.FC<{
   approval: Approval;
-  serial: number;
   onClose: () => void;
-}> = ({ approval, serial, onClose }) => {
+}> = ({ approval, onClose }) => {
   const { dispatch } = useStore();
   const [tab, setTab] = React.useState<Tab>('conversation');
   const [accessOpen, setAccessOpen] = React.useState(false);
@@ -85,7 +84,7 @@ export const ApprovalDetailPanel: React.FC<{
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-navy">#{serial}</h2>
+                <h2 className="text-xl font-bold text-navy">{approval.id}</h2>
                 <StatusPill status={approval.status} />
                 {approval.outcome && <OutcomeBadge outcome={approval.outcome} />}
               </div>
@@ -234,7 +233,7 @@ export const ApprovalDetailPanel: React.FC<{
       {accessOpen && <AccessModal approval={approval} onClose={() => setAccessOpen(false)} />}
       {forwardOpen && <ForwardToInternalModal approval={approval} onClose={() => setForwardOpen(false)} />}
       {deleteOpen && (
-        <DeleteApprovalModal approval={approval} serial={serial} onClose={() => setDeleteOpen(false)} onDeleted={onClose} />
+        <DeleteApprovalModal approval={approval} onClose={() => setDeleteOpen(false)} onDeleted={onClose} />
       )}
     </div>
   );

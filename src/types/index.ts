@@ -1,4 +1,4 @@
-export type ApprovalType = 'O&A' | 'Purchase' | 'Engineering Request' | 'Workscope Acknowledgement' | 'Other';
+export type ApprovalType = 'O&A' | 'Purchase' | 'Engineering Request' | 'Initial Workscope Acknowledgement' | 'Trace' | 'Other';
 
 export type OASubtype = 'Additional Repair' | 'Additional Replace' | 'Exchange' | 'Price Deviation' | 'Other';
 export type PurchaseSubtype = 'LLP Purchase' | 'Customer Provided Part' | 'Other';
@@ -18,13 +18,21 @@ export type FinalOutcome =
 
 export type CustomerDecision = 'Approved' | 'Rejected' | 'Clarification Requested';
 
-export const APPROVAL_TYPES: ApprovalType[] = ['O&A', 'Purchase', 'Engineering Request', 'Workscope Acknowledgement', 'Other'];
+export const APPROVAL_TYPES: ApprovalType[] = [
+  'O&A',
+  'Purchase',
+  'Engineering Request',
+  'Initial Workscope Acknowledgement',
+  'Trace',
+  'Other',
+];
 
 export const SUBTYPES_BY_TYPE: Record<ApprovalType, string[]> = {
   'O&A': ['Additional Repair', 'Additional Replace', 'Exchange', 'Price Deviation', 'Other'],
   Purchase: ['LLP Purchase', 'Customer Provided Part', 'Other'],
   'Engineering Request': [],
-  'Workscope Acknowledgement': [],
+  'Initial Workscope Acknowledgement': [],
+  Trace: [],
   Other: [],
 };
 

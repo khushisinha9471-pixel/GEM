@@ -99,7 +99,7 @@ export const ApprovalsTable: React.FC<{
     return { workOrder: wo, typeSubGroups };
   }).filter((g) => g.typeSubGroups.length > 0);
 
-  function renderRow(a: Approval, rowNumber: number) {
+  function renderRow(a: Approval) {
     const gemMsg = latestCsmResponse(a);
             const customerMsg = latestCustomerResponse(a);
             const gemClickable = role === 'csm';
@@ -108,7 +108,7 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="px-2 py-3 align-top text-right text-xs text-slate">{rowNumber}</td>
+                <td className="break-words px-2 py-3 align-top text-xs font-medium text-navy">{formatDate(a.createdAt)}</td>
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -281,19 +281,19 @@ export const ApprovalsTable: React.FC<{
     <div className="card overflow-x-auto">
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
-          <col className="w-[40px]" />
+          <col className="w-[86px]" />
           <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
           <col className="w-[100px]" />
           <col className="w-[108px]" />
-          <col className={isCustomer ? 'w-[257px]' : 'w-[236px]'} />
+          <col className={isCustomer ? 'w-[231px]' : 'w-[210px]'} />
           <col className="w-[74px]" />
           <col className="w-[112px]" />
-          <col className={isCustomer ? 'w-[241px]' : 'w-[220px]'} />
-          <col className={isCustomer ? 'w-[240px]' : 'w-[220px]'} />
+          <col className={isCustomer ? 'w-[231px]' : 'w-[210px]'} />
+          <col className={isCustomer ? 'w-[230px]' : 'w-[210px]'} />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-2 py-3 text-right">S.No.</th>
+            <th className="px-2 py-3">Date Created</th>
             <th className="px-2 py-3">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
@@ -306,8 +306,6 @@ export const ApprovalsTable: React.FC<{
         </thead>
         <tbody>
           {(() => {
-            let rowNumber = 0;
-
             return workOrderGroups.map((wg) => {
               const woCollapsed = collapsedWorkOrders.has(wg.workOrder.id);
               return (
@@ -349,7 +347,7 @@ export const ApprovalsTable: React.FC<{
                               </button>
                             </td>
                           </tr>
-                          {!typeCollapsed && tg.rows.map((a) => renderRow(a, ++rowNumber))}
+                          {!typeCollapsed && tg.rows.map((a) => renderRow(a))}
                         </React.Fragment>
                       );
                     })}
