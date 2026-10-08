@@ -184,7 +184,9 @@ export const ApprovalsTable: React.FC<{
                         )}
                         <ChevronDown size={12} className="absolute right-0 top-1 text-slate" />
                       </button>
-                      <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+                      {a.customerDecision && (
+                        <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+                      )}
 
                       {decisionOpenId === a.id && (
                         <div className="absolute left-0 top-full z-30 mt-1 w-48 rounded-lg border border-line bg-white p-2 shadow-pop">
@@ -236,7 +238,9 @@ export const ApprovalsTable: React.FC<{
                       ) : (
                         <span className="text-xs italic text-slate/60">Awaiting decision</span>
                       )}
-                      <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+                      {a.customerDecision && (
+                        <div className="mt-1 text-[11px] font-medium text-slate">{formatDate(approvalRequestUpdatedAt(a))}</div>
+                      )}
                     </div>
                   )}
                 </td>
