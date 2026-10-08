@@ -2,7 +2,7 @@ import React from 'react';
 import type { Approval, CustomerDecision } from '../types';
 import { APPROVAL_TYPES, CUSTOMER_DECISIONS, CUSTOMER_DECISION_LABELS } from '../types';
 import { StatusPill } from './StatusPill';
-import { formatCost, formatDate, formatDateSlash, formatDateTime } from '../utils/format';
+import { formatCost, formatDate, formatDateTime } from '../utils/format';
 import { approvalRequestUpdatedAt, latestCsmResponse, latestCustomerResponse } from '../utils/approvalHelpers';
 import { WORK_ORDERS } from '../data/seed';
 import { ChevronDown, Maximize2, Minimize2, FileQuestion, Paperclip, Mail, MessageSquare } from 'lucide-react';
@@ -108,7 +108,7 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="break-words px-2 py-3 align-top text-xs font-medium text-navy">{formatDateSlash(a.createdAt)}</td>
+                <td className="break-words px-2 py-3 align-top text-xs font-medium text-navy">{formatDate(a.createdAt)}</td>
 
                 <td className="relative px-2 py-3 align-top">
                   {role === 'csm' ? (
@@ -285,15 +285,15 @@ export const ApprovalsTable: React.FC<{
     <div className="card overflow-x-auto">
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
-          <col className="w-[86px]" />
+          <col className="w-[156px]" />
           <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
+          <col className="w-[92px]" />
           <col className="w-[100px]" />
-          <col className="w-[108px]" />
-          <col className={isCustomer ? 'w-[231px]' : 'w-[210px]'} />
+          <col className={isCustomer ? 'w-[213px]' : 'w-[192px]'} />
           <col className="w-[74px]" />
           <col className="w-[112px]" />
-          <col className={isCustomer ? 'w-[231px]' : 'w-[210px]'} />
-          <col className={isCustomer ? 'w-[230px]' : 'w-[210px]'} />
+          <col className={isCustomer ? 'w-[213px]' : 'w-[192px]'} />
+          <col className={isCustomer ? 'w-[212px]' : 'w-[192px]'} />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
