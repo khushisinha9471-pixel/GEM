@@ -241,15 +241,15 @@ export const INITIAL_APPROVALS: Approval[] = [
     requirement: 'The repair cost is higher than originally quoted because of updated labor estimates. We need your approval for this price change.',
     cost: 6300,
     status: 'Open',
-    createdAt: '2026-09-08T09:00:00+05:30',
+    createdAt: '2026-09-06T09:00:00+05:30',
     messages: [
       msg({
         channel: 'customer',
         authorName: 'Harini V',
         authorRole: 'CSM',
         body: 'Please review the attached cost breakdown and confirm the price deviation is acceptable.',
-        date: '2026-09-08T09:30:00+05:30',
-        attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-08', { reportType: 'Financial' })],
+        date: '2026-09-06T09:30:00+05:30',
+        attachments: [att('Cost Estimate Summary.pdf', 'reports-library', '2026-09-06', { reportType: 'Financial' })],
       }),
     ],
   }),
