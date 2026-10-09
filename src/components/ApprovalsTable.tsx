@@ -287,7 +287,7 @@ export const ApprovalsTable: React.FC<{
     <div className="card overflow-x-auto">
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
-          <col className="w-[146px]" />
+          <col className="w-[100px]" />
           <col className={isCustomer ? 'w-[22px]' : 'w-[82px]'} />
           <col className="w-[100px]" />
           <col className="w-[180px]" />
