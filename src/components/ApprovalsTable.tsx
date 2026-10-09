@@ -110,54 +110,56 @@ export const ApprovalsTable: React.FC<{
               <tr key={a.id} className="border-b border-line last:border-0">
                 <td className="break-words py-3 pl-2 pr-1 align-top text-xs font-medium text-navy">{formatDate(a.createdAt)}</td>
 
-                <td className="relative py-3 pl-1 pr-2 align-top">
-                  {role === 'csm' ? (
-                    <div ref={statusOpenId === a.id ? statusRef : undefined} className="relative">
-                      <button
-                        onClick={() => setStatusOpenId((cur) => (cur === a.id ? null : a.id))}
-                        className="inline-flex items-center gap-0.5"
-                        title="Change status"
+                <td className="relative py-3 px-1 align-top">
+                  <div className="flex justify-center">
+                    {role === 'csm' ? (
+                      <div ref={statusOpenId === a.id ? statusRef : undefined} className="relative">
+                        <button
+                          onClick={() => setStatusOpenId((cur) => (cur === a.id ? null : a.id))}
+                          className="inline-flex items-center gap-0.5"
+                          title="Change status"
+                        >
+                          <StatusPill status={a.status} />
+                          <ChevronDown size={10} className="text-slate" />
+                        </button>
+                        {statusOpenId === a.id && (
+                          <div className="absolute left-0 top-8 z-30 w-36 overflow-hidden rounded-lg border border-line bg-white shadow-pop">
+                            <button
+                              onClick={() => {
+                                setStatusOpenId(null);
+                                if (a.status !== 'Open') onReopen?.(a);
+                              }}
+                              className={`block w-full px-3 py-2 text-left text-xs hover:bg-surface ${
+                                a.status === 'Open' ? 'font-semibold text-navy' : 'text-slate'
+                              }`}
+                            >
+                              Open
+                            </button>
+                            <button
+                              onClick={() => {
+                                setStatusOpenId(null);
+                                if (a.status !== 'Closed') onRequestClose?.(a);
+                              }}
+                              className={`block w-full px-3 py-2 text-left text-xs hover:bg-surface ${
+                                a.status === 'Closed' ? 'font-semibold text-navy' : 'text-slate'
+                              }`}
+                            >
+                              Closed
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span
+                        title={a.status}
+                        className={`mt-1 flex h-4 w-4 items-center justify-center rounded-full ${
+                          a.status === 'Open' ? 'bg-amber-100' : 'bg-emerald-100'
+                        }`}
                       >
-                        <StatusPill status={a.status} />
-                        <ChevronDown size={10} className="text-slate" />
-                      </button>
-                      {statusOpenId === a.id && (
-                        <div className="absolute left-0 top-8 z-30 w-36 overflow-hidden rounded-lg border border-line bg-white shadow-pop">
-                          <button
-                            onClick={() => {
-                              setStatusOpenId(null);
-                              if (a.status !== 'Open') onReopen?.(a);
-                            }}
-                            className={`block w-full px-3 py-2 text-left text-xs hover:bg-surface ${
-                              a.status === 'Open' ? 'font-semibold text-navy' : 'text-slate'
-                            }`}
-                          >
-                            Open
-                          </button>
-                          <button
-                            onClick={() => {
-                              setStatusOpenId(null);
-                              if (a.status !== 'Closed') onRequestClose?.(a);
-                            }}
-                            className={`block w-full px-3 py-2 text-left text-xs hover:bg-surface ${
-                              a.status === 'Closed' ? 'font-semibold text-navy' : 'text-slate'
-                            }`}
-                          >
-                            Closed
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <span
-                      title={a.status}
-                      className={`mt-1 flex h-4 w-4 items-center justify-center rounded-full ${
-                        a.status === 'Open' ? 'bg-amber-100' : 'bg-emerald-100'
-                      }`}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${a.status === 'Open' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-                    </span>
-                  )}
+                        <span className={`h-1.5 w-1.5 rounded-full ${a.status === 'Open' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                      </span>
+                    )}
+                  </div>
                 </td>
 
                 <td className="break-words px-3 py-3 align-top text-sm text-slate">{a.subtype ?? '—'}</td>
@@ -298,7 +300,7 @@ export const ApprovalsTable: React.FC<{
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
             <th className="py-3 pl-2 pr-1">Created On</th>
-            <th className="py-3 pl-1 pr-2">{isCustomer ? '' : 'Status'}</th>
+            <th className="px-1 py-3 text-center">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
