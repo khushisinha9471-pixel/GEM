@@ -283,17 +283,17 @@ export const ApprovalsTable: React.FC<{
 
   return (
     <div className="card overflow-x-auto">
-      <table className="w-full min-w-0 max-w-[1200px] table-fixed border-collapse text-left">
+      <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
           <col className="w-[156px]" />
           <col className={isCustomer ? 'w-[28px]' : 'w-[90px]'} />
           <col className="w-[92px]" />
           <col className="w-[100px]" />
-          <col className={isCustomer ? 'w-[213px]' : 'w-[192px]'} />
+          <col />
           <col className="w-[74px]" />
           <col className="w-[112px]" />
-          <col className={isCustomer ? 'w-[213px]' : 'w-[192px]'} />
-          <col className={isCustomer ? 'w-[212px]' : 'w-[192px]'} />
+          <col />
+          <col />
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
