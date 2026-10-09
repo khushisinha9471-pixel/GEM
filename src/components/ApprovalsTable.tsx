@@ -108,18 +108,18 @@ export const ApprovalsTable: React.FC<{
 
             return (
               <tr key={a.id} className="border-b border-line last:border-0">
-                <td className="break-words px-2 py-3 align-top text-xs font-medium text-navy">{formatDate(a.createdAt)}</td>
+                <td className="break-words py-3 pl-2 pr-1 align-top text-xs font-medium text-navy">{formatDate(a.createdAt)}</td>
 
-                <td className="relative px-2 py-3 align-top">
+                <td className="relative py-3 pl-1 pr-2 align-top">
                   {role === 'csm' ? (
                     <div ref={statusOpenId === a.id ? statusRef : undefined} className="relative">
                       <button
                         onClick={() => setStatusOpenId((cur) => (cur === a.id ? null : a.id))}
-                        className="inline-flex items-center gap-1"
+                        className="inline-flex items-center gap-0.5"
                         title="Change status"
                       >
                         <StatusPill status={a.status} />
-                        <ChevronDown size={12} className="text-slate" />
+                        <ChevronDown size={10} className="text-slate" />
                       </button>
                       {statusOpenId === a.id && (
                         <div className="absolute left-0 top-8 z-30 w-36 overflow-hidden rounded-lg border border-line bg-white shadow-pop">
@@ -285,8 +285,8 @@ export const ApprovalsTable: React.FC<{
     <div className="card overflow-x-auto">
       <table className="w-full min-w-0 table-fixed border-collapse text-left">
         <colgroup>
-          <col className="w-[150px]" />
-          <col className={isCustomer ? 'w-[26px]' : 'w-[90px]'} />
+          <col className="w-[146px]" />
+          <col className={isCustomer ? 'w-[22px]' : 'w-[82px]'} />
           <col className="w-[100px]" />
           <col className="w-[180px]" />
           <col />
@@ -297,8 +297,8 @@ export const ApprovalsTable: React.FC<{
         </colgroup>
         <thead>
           <tr className="border-b border-line bg-surface/50 text-[11px] font-semibold uppercase tracking-wide text-slate">
-            <th className="px-2 py-3">Created On</th>
-            <th className="px-2 py-3">{isCustomer ? '' : 'Status'}</th>
+            <th className="py-3 pl-2 pr-1">Created On</th>
+            <th className="py-3 pl-1 pr-2">{isCustomer ? '' : 'Status'}</th>
             <th className="px-3 py-3">Subtype</th>
             <th className="px-3 py-3">Part</th>
             <th className="px-3 py-3">Requirement</th>
