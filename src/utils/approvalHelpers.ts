@@ -44,9 +44,9 @@ export function approvalRequestUpdatedAt(a: Approval): string {
   return decisionDate(a) ?? latestCsmResponse(a)?.date ?? a.createdAt;
 }
 
-const OVERDUE_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
+const OVERDUE_THRESHOLD_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
 
-// Still awaiting a customer decision and has been open for more than 3 days
+// Still awaiting a customer decision and has been open for more than 2 days
 // (relative to the fixed demo "now", not the viewer's real clock).
 export function isOverdue(a: Approval): boolean {
   if (a.status !== 'Open' || a.customerDecision) return false;

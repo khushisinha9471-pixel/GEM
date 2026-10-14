@@ -32,7 +32,7 @@ export const SummaryCards: React.FC<{
           <span className="text-[10px] font-semibold uppercase tracking-wide text-slate">Overdue Approvals</span>
         </div>
         <div className="mt-1 text-xl font-bold text-navy">{overdueCount}</div>
-        <div className="mt-0.5 text-[9px] font-medium leading-tight text-slate/70">Open for more than 3 days</div>
+        <div className="mt-0.5 text-[9px] font-medium leading-tight text-slate/70">Open for more than 2 days</div>
       </button>
     </div>
   );
