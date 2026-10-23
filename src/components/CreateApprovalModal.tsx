@@ -174,7 +174,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               <input
                 value={partNumber}
                 onChange={(e) => setPartNumber(e.target.value)}
-                placeholder="Part Number (e.g. 123456)"
+                placeholder="Add Part Number"
                 className="field-input"
               />
               <input
@@ -210,7 +210,7 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
               <input
                 value={cost}
                 onChange={(e) => setCost(e.target.value.replace(/[^0-9.]/g, ''))}
-                placeholder="12,500"
+                placeholder="Enter dollar value"
                 className="field-input pl-6"
               />
             </div>

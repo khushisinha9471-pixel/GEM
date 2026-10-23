@@ -68,3 +68,43 @@ export function searchableText(a: Approval): string {
     .join(' ')
     .toLowerCase();
 }
+
+export type SortBy = 'none' | 'createdOn' | 'cost';
+export type SortDir = 'asc' | 'desc';
+export interface SortState {
+  by: SortBy;
+  dir: SortDir;
+}
+export const DEFAULT_SORT: SortState = { by: 'none', dir: 'asc' };
+
+// The table's normal ordering when no explicit sort is chosen: Open
+// approvals first (longest-open at the top), then Closed approvals
+// (most recently closed at the top).
+function defaultStatusSort(a: Approval, b: Approval): number {
+  if (a.status !== b.status) return a.status === 'Open' ? -1 : 1;
+  if (a.status === 'Open') {
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  }
+  const aClosed = new Date(a.closedAt ?? a.createdAt).getTime();
+  const bClosed = new Date(b.closedAt ?? b.createdAt).getTime();
+  return bClosed - aClosed;
+}
+
+export function sortApprovals(approvals: Approval[], sort: SortState): Approval[] {
+  const list = [...approvals];
+  if (sort.by === 'none') return list.sort(defaultStatusSort);
+  if (sort.by === 'createdOn') {
+    return list.sort((a, b) => {
+      const diff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return sort.dir === 'asc' ? diff : -diff;
+    });
+  }
+  // Cost — approvals with no cost sink to the bottom regardless of direction.
+  return list.sort((a, b) => {
+    if (a.cost == null && b.cost == null) return 0;
+    if (a.cost == null) return 1;
+    if (b.cost == null) return -1;
+    const diff = a.cost - b.cost;
+    return sort.dir === 'asc' ? diff : -diff;
+  });
+}

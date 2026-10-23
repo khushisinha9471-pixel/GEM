@@ -1,26 +1,37 @@
 import React from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import type { ApprovalType, CustomerDecision } from '../types';
-import { APPROVAL_TYPES, CUSTOMER_DECISIONS } from '../types';
+import { APPROVAL_TYPES, ALL_SUBTYPES, CUSTOMER_DECISIONS } from '../types';
 import { WORK_ORDERS } from '../data/seed';
+import { SortControl } from '../components/SortControl';
+import type { SortState } from '../utils/approvalHelpers';
 
 export type DecisionFilter = 'All' | 'Awaiting Decision' | CustomerDecision;
 
 export interface CustomerFilters {
   workOrderId: 'All' | string;
   approvalType: 'All' | ApprovalType;
-  decision: DecisionFilter;
   status: 'All' | 'Open' | 'Closed';
+  subtype: 'All' | string;
+  decision: DecisionFilter;
 }
 
-export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = { workOrderId: 'All', approvalType: 'All', decision: 'All', status: 'All' };
+export const DEFAULT_CUSTOMER_FILTERS: CustomerFilters = {
+  workOrderId: 'All',
+  approvalType: 'All',
+  status: 'All',
+  subtype: 'All',
+  decision: 'All',
+};
 
 export const CustomerToolbar: React.FC<{
   search: string;
   onSearch: (v: string) => void;
   filters: CustomerFilters;
   onFilters: (f: CustomerFilters) => void;
-}> = ({ search, onSearch, filters, onFilters }) => {
+  sort: SortState;
+  onSort: (s: SortState) => void;
+}> = ({ search, onSearch, filters, onFilters, sort, onSort }) => {
   const [open, setOpen] = React.useState(false);
   const popRef = React.useRef<HTMLDivElement>(null);
 
@@ -35,8 +46,9 @@ export const CustomerToolbar: React.FC<{
   const activeFilterCount = [
     filters.workOrderId !== 'All',
     filters.approvalType !== 'All',
-    filters.decision !== 'All',
     filters.status !== 'All',
+    filters.subtype !== 'All',
+    filters.decision !== 'All',
   ].filter(Boolean).length;
 
   return (
@@ -113,6 +125,35 @@ export const CustomerToolbar: React.FC<{
             </div>
 
             <div className="mt-3">
+              <label className="field-label">Status</label>
+              <select
+                value={filters.status}
+                onChange={(e) => onFilters({ ...filters, status: e.target.value as CustomerFilters['status'] })}
+                className="select-input"
+              >
+                <option value="All">All</option>
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </div>
+
+            <div className="mt-3">
+              <label className="field-label">Subtype</label>
+              <select
+                value={filters.subtype}
+                onChange={(e) => onFilters({ ...filters, subtype: e.target.value })}
+                className="select-input"
+              >
+                <option value="All">All Subtypes</option>
+                {ALL_SUBTYPES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mt-3">
               <label className="field-label">Decision</label>
               <select
                 value={filters.decision}
@@ -128,22 +169,11 @@ export const CustomerToolbar: React.FC<{
                 ))}
               </select>
             </div>
-
-            <div className="mt-3">
-              <label className="field-label">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => onFilters({ ...filters, status: e.target.value as CustomerFilters['status'] })}
-                className="select-input"
-              >
-                <option value="All">All</option>
-                <option value="Open">Open</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
           </div>
         )}
       </div>
+
+      <SortControl sort={sort} onSort={onSort} />
     </div>
   );
 };

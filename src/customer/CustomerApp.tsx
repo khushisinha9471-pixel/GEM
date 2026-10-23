@@ -6,13 +6,14 @@ import { CustomerToolbar, DEFAULT_CUSTOMER_FILTERS, type CustomerFilters } from 
 import { ApprovalsTable } from '../components/ApprovalsTable';
 import { CustomerToastContainer } from './CustomerToastContainer';
 import { CustomerApprovalDetail } from './CustomerApprovalDetail';
-import { searchableText, isOverdue } from '../utils/approvalHelpers';
+import { searchableText, isOverdue, sortApprovals, DEFAULT_SORT, type SortState } from '../utils/approvalHelpers';
 import type { Approval, ApprovalStatus, CustomerDecision } from '../types';
 
 const CustomerAppShell: React.FC = () => {
   const { state, dispatch } = useCustomerStore();
   const [search, setSearch] = React.useState('');
   const [filters, setFilters] = React.useState<CustomerFilters>(DEFAULT_CUSTOMER_FILTERS);
+  const [sort, setSort] = React.useState<SortState>(DEFAULT_SORT);
   const [statusCard, setStatusCard] = React.useState<ApprovalStatus | 'All'>('All');
   const [overdueOnly, setOverdueOnly] = React.useState(false);
   const [selectedApprovalId, setSelectedApprovalId] = React.useState<string | null>(null);
@@ -29,6 +30,7 @@ const CustomerAppShell: React.FC = () => {
     .filter((a) => (overdueOnly ? isOverdue(a) : true))
     .filter((a) => (filters.workOrderId === 'All' ? true : a.workOrderId === filters.workOrderId))
     .filter((a) => (filters.approvalType === 'All' ? true : a.type === filters.approvalType))
+    .filter((a) => (filters.subtype === 'All' ? true : a.subtype === filters.subtype))
     .filter((a) =>
       filters.decision === 'All'
         ? true
@@ -36,18 +38,9 @@ const CustomerAppShell: React.FC = () => {
         ? !a.customerDecision
         : a.customerDecision === filters.decision
     )
-    .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())))
-    .sort((a, b) => {
-      // Open approvals first, longest-open at the top; Closed approvals after,
-      // most recently closed at the top.
-      if (a.status !== b.status) return a.status === 'Open' ? -1 : 1;
-      if (a.status === 'Open') {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      }
-      const aClosed = new Date(a.closedAt ?? a.createdAt).getTime();
-      const bClosed = new Date(b.closedAt ?? b.createdAt).getTime();
-      return bClosed - aClosed;
-    });
+    .filter((a) => (search.trim() === '' ? true : searchableText(a).includes(search.trim().toLowerCase())));
+
+  const sorted = sortApprovals(filtered, sort);
 
   const selectedApproval = approvals.find((a) => a.id === selectedApprovalId) ?? null;
 
@@ -83,13 +76,20 @@ const CustomerAppShell: React.FC = () => {
             <p className="text-xs font-medium text-slate">
               Showing {filtered.length} of {approvals.length} approvals
             </p>
-            <CustomerToolbar search={search} onSearch={setSearch} filters={filters} onFilters={setFilters} />
+            <CustomerToolbar
+              search={search}
+              onSearch={setSearch}
+              filters={filters}
+              onFilters={setFilters}
+              sort={sort}
+              onSort={setSort}
+            />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto pb-6">
           <ApprovalsTable
-            approvals={filtered}
+            approvals={sorted}
             role="customer"
             onOpenConversation={(a: Approval, decision) => openApproval(a.id, decision)}
             onQuickDecision={handleQuickDecision}

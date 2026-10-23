@@ -36,6 +36,15 @@ export const SUBTYPES_BY_TYPE: Record<ApprovalType, string[]> = {
   Other: [],
 };
 
+// Flat, deduped list of every subtype across all approval types, for the
+// Subtype filter dropdown (independent of which Type is selected). "Other"
+// is shared by more than one type, so it's pulled out and placed last.
+const rawSubtypes = Array.from(new Set(Object.values(SUBTYPES_BY_TYPE).flat()));
+export const ALL_SUBTYPES: string[] = [
+  ...rawSubtypes.filter((s) => s !== 'Other'),
+  ...(rawSubtypes.includes('Other') ? ['Other'] : []),
+];
+
 export const FINAL_OUTCOMES: FinalOutcome[] = [
   'Carry Forward',
   'Customer Supplied Another Part',
