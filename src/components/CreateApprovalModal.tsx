@@ -39,6 +39,32 @@ const InstructedInput: React.FC<{
   );
 };
 
+// Same idea as InstructedInput, for multi-line fields — the instruction sits
+// at the top-left (where typed text starts) instead of vertically centered.
+const InstructedTextarea: React.FC<{
+  value: string;
+  onChange: (v: string) => void;
+  instruction: string;
+  rows: number;
+}> = ({ value, onChange, instruction, rows }) => {
+  const [focused, setFocused] = React.useState(false);
+  return (
+    <div className="relative">
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        rows={rows}
+        className="textarea-input"
+      />
+      {!focused && !value && (
+        <span className="pointer-events-none absolute left-3 top-2 text-sm text-slate/60">{instruction}</span>
+      )}
+    </div>
+  );
+};
+
 export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id: string) => void }> = ({
   onClose,
   onCreated,
@@ -225,12 +251,11 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 
           <div>
             <label className="field-label">Requirement *</label>
-            <textarea
+            <InstructedTextarea
               value={requirement}
-              onChange={(e) => setRequirement(e.target.value)}
+              onChange={setRequirement}
+              instruction="What is the requirement, and why?"
               rows={4}
-              placeholder="What is the requirement, and why?"
-              className="textarea-input"
             />
             {errors.requirement && <p className="mt-1 text-xs text-red-600">{errors.requirement}</p>}
           </div>
@@ -249,12 +274,11 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 
           <div>
             <label className="field-label">GEM Comment</label>
-            <textarea
+            <InstructedTextarea
               value={csmResponse}
-              onChange={(e) => setCsmResponse(e.target.value)}
+              onChange={setCsmResponse}
+              instruction="Your additional message to the customer"
               rows={3}
-              placeholder="Your additional message to the customer"
-              className="textarea-input"
             />
           </div>
 
