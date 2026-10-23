@@ -7,6 +7,38 @@ import { CUSTOMERS, WORK_ORDERS } from '../data/seed';
 import { AttachmentManager } from './AttachmentManager';
 import { CustomerMultiSelect } from './CustomerMultiSelect';
 
+// An input whose instruction text (shown via an overlay, not the native
+// placeholder) disappears as soon as the field is focused, rather than only
+// once something is typed — so a hint like "Add Part Number" never reads as
+// a pre-filled value.
+const InstructedInput: React.FC<{
+  value: string;
+  onChange: (v: string) => void;
+  instruction: string;
+  inputClassName: string;
+  prefix?: React.ReactNode;
+  overlayLeftClassName?: string;
+}> = ({ value, onChange, instruction, inputClassName, prefix, overlayLeftClassName = 'left-3' }) => {
+  const [focused, setFocused] = React.useState(false);
+  return (
+    <div className="relative">
+      {prefix}
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={inputClassName}
+      />
+      {!focused && !value && (
+        <span className={`pointer-events-none absolute top-1/2 -translate-y-1/2 ${overlayLeftClassName} text-sm text-slate/60`}>
+          {instruction}
+        </span>
+      )}
+    </div>
+  );
+};
+
 export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id: string) => void }> = ({
   onClose,
   onCreated,
@@ -171,17 +203,17 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
           <div>
             <label className="field-label">Part</label>
             <div className="grid grid-cols-2 gap-2">
-              <input
+              <InstructedInput
                 value={partNumber}
-                onChange={(e) => setPartNumber(e.target.value)}
-                placeholder="Add Part Number"
-                className="field-input"
+                onChange={setPartNumber}
+                instruction="Add Part Number"
+                inputClassName="field-input"
               />
-              <input
+              <InstructedInput
                 value={partDescription}
-                onChange={(e) => setPartDescription(e.target.value)}
-                placeholder="Description (e.g. HPT Blade)"
-                className="field-input"
+                onChange={setPartDescription}
+                instruction="Add Part Description"
+                inputClassName="field-input"
               />
             </div>
             {(partNumber || partDescription) && (
@@ -205,15 +237,14 @@ export const CreateApprovalModal: React.FC<{ onClose: () => void; onCreated: (id
 
           <div>
             <label className="field-label">Cost</label>
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate">$</span>
-              <input
-                value={cost}
-                onChange={(e) => setCost(e.target.value.replace(/[^0-9.]/g, ''))}
-                placeholder="Enter dollar value"
-                className="field-input pl-6"
-              />
-            </div>
+            <InstructedInput
+              value={cost}
+              onChange={(v) => setCost(v.replace(/[^0-9.]/g, ''))}
+              instruction="Enter dollar value"
+              inputClassName="field-input pl-6"
+              overlayLeftClassName="left-6"
+              prefix={<span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate">$</span>}
+            />
           </div>
 
           <div>

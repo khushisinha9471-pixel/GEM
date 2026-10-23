@@ -68,6 +68,8 @@ export const CustomerToolbar: React.FC<{
         )}
       </div>
 
+      <SortControl sort={sort} onSort={onSort} />
+
       <div className="relative" ref={popRef}>
         <button
           onClick={() => setOpen((v) => !v)}
@@ -172,8 +174,6 @@ export const CustomerToolbar: React.FC<{
           </div>
         )}
       </div>
-
-      <SortControl sort={sort} onSort={onSort} />
     </div>
   );
 };
